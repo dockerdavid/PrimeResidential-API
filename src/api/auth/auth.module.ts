@@ -4,9 +4,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
 
 import { JwtStrategy } from './strategies/jwt.strategy';
+
 import { AuthController } from './auth.controller';
-import { Users } from './entities/users.entity';
 import { AuthService } from './auth.service';
+
+import { UsersEntity } from 'src/entities/users.entity';
 
 import envVars from 'src/config/env';
 
@@ -19,7 +21,7 @@ import envVars from 'src/config/env';
       secret: envVars.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
-    TypeOrmModule.forFeature([Users])
+    TypeOrmModule.forFeature([UsersEntity])
   ],
   controllers: [AuthController],
   providers: [JwtStrategy, AuthService],

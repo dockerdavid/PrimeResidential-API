@@ -6,16 +6,16 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Repository } from 'typeorm';
 
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
-import { Users } from '../entities/users.entity';
 
 import envVars from 'src/config/env';
+import { UsersEntity } from 'src/entities/users.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
 
     constructor(
-        @InjectRepository(Users)
-        private readonly usersRepository: Repository<Users>,
+        @InjectRepository(UsersEntity)
+        private readonly usersRepository: Repository<UsersEntity>,
     ) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(payload: JwtPayload): Promise<{ user: Users }> {
+    async validate(payload: JwtPayload): Promise<{ user: UsersEntity }> {
         const { id } = payload;
 
         const user = await this.usersRepository.findOne({

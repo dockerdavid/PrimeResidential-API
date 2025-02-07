@@ -9,7 +9,7 @@ import envVars from './config/env';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, whitelist: true, transform: true }));
 
   const config = new DocumentBuilder()
     .setTitle('Services QPS API')

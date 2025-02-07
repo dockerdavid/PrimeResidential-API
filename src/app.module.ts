@@ -1,10 +1,10 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 
+import { ServicesModule } from './api/services/services.module';
 import { AuthModule } from './api/auth/auth.module';
 
 import envVars from './config/env';
-import { Users } from './api/auth/entities/users.entity';
 
 @Module({
   imports: [
@@ -15,9 +15,10 @@ import { Users } from './api/auth/entities/users.entity';
       username: envVars.DB_USERNAME,
       password: envVars.DB_PASSWORD,
       database: envVars.DB_DATABASE,
-      entities: [Users]
+      entities: [__dirname + '/entities/*.entity{.ts,.js}'],
     }),
     AuthModule,
+    ServicesModule,
   ],
   controllers: [],
   providers: [],

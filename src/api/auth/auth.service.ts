@@ -4,15 +4,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 
-import { Users } from './entities/users.entity';
 import { UserDto } from './dto/user.dto';
+import { UsersEntity } from 'src/entities/users.entity';
 
 @Injectable()
 export class AuthService {
 
   constructor(
-    @InjectRepository(Users)
-    private readonly usersRepository: Repository<Users>,
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
   ) { }
 
   async login(userDto: UserDto) {
