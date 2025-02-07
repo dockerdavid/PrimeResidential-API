@@ -1,26 +1,80 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { Repository } from 'typeorm';
+
+import { PageOptionsDto } from 'src/dto/page-options.dto';
 import { CreateCostDto } from './dto/create-cost.dto';
 import { UpdateCostDto } from './dto/update-cost.dto';
+import { PageMetaDto } from 'src/dto/page-meta.dto';
+import { PageDto } from 'src/dto/page.dto';
+
+import { CostsEntity } from 'src/entities/costs.entity';
 
 @Injectable()
 export class CostsService {
-  create(createCostDto: CreateCostDto) {
-    return 'This action adds a new cost';
+
+  constructor(
+    @InjectRepository(CostsEntity)
+    private costsRepository: Repository<CostsEntity>,
+  ) { }
+
+  async create(createCostDto: CreateCostDto) {
+    const cost = this.costsRepository.create(createCostDto);
+
+    await this.costsRepository.save(cost);
+
+    return cost;
   }
 
-  findAll() {
-    return `This action returns all costs`;
+  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<CostsEntity>> {
+    const [items, totalCount] = await this.costsRepository.findAndCount({
+      order: { createdAt: pageOptionsDto.order },
+      skip: pageOptionsDto.skip,
+      take: pageOptionsDto.take,
+    });
+
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cost`;
+  async findOne(id: string) {
+    const cost = await this.costsRepository.findOne({
+      where: { id },
+    });
+
+    if (!cost) {
+      throw new NotFoundException(`Cost with ID ${id} not found`);
+    }
+
+    return cost;
   }
 
-  update(id: number, updateCostDto: UpdateCostDto) {
-    return `This action updates a #${id} cost`;
+  async update(id: string, updateCostDto: UpdateCostDto) {
+    const cost = await this.costsRepository.preload({
+      id,
+      ...updateCostDto,
+    });
+
+    if (!cost) {
+      throw new NotFoundException(`Cost with ID ${id} not found`);
+    }
+
+    await this.costsRepository.save(cost);
+
+    return cost;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cost`;
+  async remove(id: string) {
+    const cost = await this.costsRepository.findOne({
+      where: { id },
+    });
+
+    if (!cost) {
+      throw new NotFoundException(`Cost with ID ${id} not found`);
+    }
+
+    return this.costsRepository.remove(cost);
   }
 }

@@ -1,34 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { CostsService } from './costs.service';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+
+import { ApiPaginatedResponse } from 'src/decorators/api-paginated-response.decorator';
+
+import { PageOptionsDto } from 'src/dto/page-options.dto';
 import { CreateCostDto } from './dto/create-cost.dto';
 import { UpdateCostDto } from './dto/update-cost.dto';
+import { PageDto } from 'src/dto/page.dto';
 
+import { CostsService } from './costs.service';
+
+import { CostsEntity } from 'src/entities/costs.entity';
+
+@ApiBearerAuth()
+@ApiTags('costs')
 @Controller('costs')
 export class CostsController {
-  constructor(private readonly costsService: CostsService) {}
+  constructor(private readonly costsService: CostsService) { }
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   create(@Body() createCostDto: CreateCostDto) {
     return this.costsService.create(createCostDto);
   }
 
   @Get()
-  findAll() {
-    return this.costsService.findAll();
+  @ApiPaginatedResponse(CostsEntity)
+  @UseGuards(AuthGuard('jwt'))
+  findAll(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<CostsEntity>> {
+    return this.costsService.findAll(pageOptionsDto);
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
   findOne(@Param('id') id: string) {
-    return this.costsService.findOne(+id);
+    return this.costsService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   update(@Param('id') id: string, @Body() updateCostDto: UpdateCostDto) {
-    return this.costsService.update(+id, updateCostDto);
+    return this.costsService.update(id, updateCostDto);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   remove(@Param('id') id: string) {
-    return this.costsService.remove(+id);
+    return this.costsService.remove(id);
   }
 }

@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 import { ApiPaginatedResponse } from 'src/decorators/api-paginated-response.decorator';
@@ -12,6 +13,8 @@ import { CommunitiesService } from './communities.service';
 
 import { CommunitiesEntity } from 'src/entities/communities.entity';
 
+@ApiBearerAuth()
+@ApiTags('communities')
 @Controller('communities')
 export class CommunitiesController {
   constructor(private readonly communitiesService: CommunitiesService) { }
