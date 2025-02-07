@@ -13,7 +13,6 @@ import { CostsEntity } from 'src/entities/costs.entity';
 
 @Injectable()
 export class CostsService {
-
   constructor(
     @InjectRepository(CostsEntity)
     private costsRepository: Repository<CostsEntity>,
