@@ -5,6 +5,7 @@ import { ServicesModule } from './api/services/services.module';
 import { AuthModule } from './api/auth/auth.module';
 import { UsersModule } from './api/users/users.module';
 import { CompaniesModule } from './api/companies/companies.module';
+import { CommunitiesModule } from './api/communities/communities.module';
 
 import envVars from './config/env';
 
@@ -23,6 +24,7 @@ import envVars from './config/env';
     ServicesModule,
     UsersModule,
     CompaniesModule,
+    CommunitiesModule,
   ],
   controllers: [],
   providers: [],
