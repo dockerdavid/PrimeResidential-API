@@ -6,6 +6,12 @@ import { AuthModule } from './api/auth/auth.module';
 import { UsersModule } from './api/users/users.module';
 import { CompaniesModule } from './api/companies/companies.module';
 import { CommunitiesModule } from './api/communities/communities.module';
+import { CostsModule } from './api/costs/costs.module';
+import { ExtrasModule } from './api/extras/extras.module';
+import { StatusesModule } from './api/statuses/statuses.module';
+import { TypesModule } from './api/types/types.module';
+import { DashboardModule } from './api/dashboard/dashboard.module';
+import { CalendarModule } from './api/calendar/calendar.module';
 
 import envVars from './config/env';
 
@@ -25,6 +31,12 @@ import envVars from './config/env';
     UsersModule,
     CompaniesModule,
     CommunitiesModule,
+    CostsModule,
+    ExtrasModule,
+    StatusesModule,
+    TypesModule,
+    DashboardModule,
+    CalendarModule,
   ],
   controllers: [],
   providers: [],
