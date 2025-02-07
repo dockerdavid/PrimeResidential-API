@@ -1,12 +1,10 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-
+import { CreateUserDto } from './create-user.dto';
 import { IsString } from 'class-validator';
 
-import { CreateServiceDto } from './create-service.dto';
-
-export class UpdateServiceDto extends PartialType(CreateServiceDto) {
+export class UpdateUserDto extends PartialType(CreateUserDto) {
     @ApiProperty({
-        description: 'The id of the service',
+        description: 'The id of the user',
         example: "1",
     })
     @IsString()

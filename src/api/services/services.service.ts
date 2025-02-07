@@ -78,7 +78,15 @@ export class ServicesService {
     return service;
   }
 
-  remove(id: string) {
-    return this.servicesRepository.delete(id);
+  async remove(id: string) {
+    const service = await this.servicesRepository.findOne({
+      where: { id },
+    });
+
+    if (!service) {
+      throw new NotFoundException(`Service with ID ${id} not found`);
+    }
+
+    await this.servicesRepository.remove(service);
   }
 }
