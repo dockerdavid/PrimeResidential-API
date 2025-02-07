@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 
 import { ServicesModule } from './api/services/services.module';
 import { AuthModule } from './api/auth/auth.module';
+import { UsersModule } from './api/users/users.module';
 
 import envVars from './config/env';
 
@@ -19,6 +20,7 @@ import envVars from './config/env';
     }),
     AuthModule,
     ServicesModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
