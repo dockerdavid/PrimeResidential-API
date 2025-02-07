@@ -87,6 +87,6 @@ export class ServicesService {
       throw new NotFoundException(`Service with ID ${id} not found`);
     }
 
-    await this.servicesRepository.remove(service);
+    return this.servicesRepository.remove(service);
   }
 }

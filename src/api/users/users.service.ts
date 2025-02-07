@@ -63,15 +63,17 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.usersRepository.preload({
-      id: +id,
+      id,
       ...updateUserDto,
     });
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`Service with ID ${id} not found`);
     }
 
-    return this.usersRepository
+    await this.usersRepository.save(user);
+
+    return user;
   }
 
   async remove(id: string) {
