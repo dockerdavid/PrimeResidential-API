@@ -42,7 +42,7 @@ export class ServicesService {
     return service;
   }
 
-  async findByUser(userId: string, pageOptionsDto: PageOptionsDto, createServiceDto: CreateServiceDto): Promise<PageDto<ServicesEntity>> {
+  async findByUser(userId: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
     const [items, totalCount] = await this.servicesRepository.findAndCount({
       where: { userId },
       order: { date: pageOptionsDto.order },

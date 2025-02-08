@@ -30,14 +30,13 @@ export class ServicesController {
     return this.servicesService.findOne(id);
   }
 
-  @Get('/by-user/:userId')
+  @Post('/by-user/:userId')
   @UseGuards(AuthGuard('jwt'))
   findByUser(
     @Param('userId') userId: string,
     @Query() pageOptionsDto: PageOptionsDto,
-    @Body() createServiceDto: CreateServiceDto
   ) {
-    return this.servicesService.findByUser(userId, pageOptionsDto, createServiceDto);
+    return this.servicesService.findByUser(userId, pageOptionsDto);
   }
 
   @Post()
