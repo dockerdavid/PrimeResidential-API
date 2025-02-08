@@ -14,7 +14,7 @@ import { TypesService } from './types.service';
 import { TypesEntity } from 'src/entities/types.entity';
 
 @ApiBearerAuth()
-@ApiTags('statuses')
+@ApiTags('types')
 @Controller('types')
 export class TypesController {
   constructor(private readonly typesService: TypesService) { }
