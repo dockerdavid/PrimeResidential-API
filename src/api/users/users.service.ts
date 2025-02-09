@@ -34,12 +34,23 @@ export class UsersService {
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UsersEntity>> {
-    const [items, totalCount] = await this.usersRepository.findAndCount({
-      order: { createdAt: pageOptionsDto.order },
-      skip: pageOptionsDto.skip,
-      take: pageOptionsDto.take,
-      select: { id: true, name: true, email: true, phoneNumber: true, roleId: true, createdAt: true },
-    });
+    const queryBuilder = this.usersRepository.createQueryBuilder('user');
+    queryBuilder.innerJoinAndSelect('user.role', 'role');
+    queryBuilder.orderBy('user.createdAt', pageOptionsDto.order);
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.select([
+      'user.id',
+      'user.name',
+      'user.email',
+      'user.phoneNumber',
+      'user.roleId',
+      'user.createdAt',
+      'role.id',
+      'role.name',
+    ]);
+
+    const [items, totalCount] = await queryBuilder.getManyAndCount();
 
     const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
 
@@ -52,10 +63,20 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    const user = await this.usersRepository.findOne({
-      select: { id: true, name: true, email: true, phoneNumber: true, roleId: true, createdAt: true },
-      where: { id },
-    });
+    const user = await this.usersRepository.createQueryBuilder('user')
+      .innerJoinAndSelect('user.role', 'role')
+      .where('user.id = :id', { id })
+      .select([
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.phoneNumber',
+        'user.roleId',
+        'user.createdAt',
+        'role.id',
+        'role.name',
+      ])
+      .getOne();
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);

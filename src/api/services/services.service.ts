@@ -20,11 +20,17 @@ export class ServicesService {
   ) { }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
-    const [items, totalCount] = await this.servicesRepository.findAndCount({
-      order: { date: pageOptionsDto.order },
-      skip: pageOptionsDto.skip,
-      take: pageOptionsDto.take,
-    });
+    const queryBuilder = this.servicesRepository.createQueryBuilder('services')
+
+    queryBuilder
+      .leftJoinAndSelect('services.community', 'community')
+      .leftJoinAndSelect('services.type', 'type')
+      .leftJoinAndSelect('services.status', 'status')
+      .orderBy('services.date', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+
+    const [items, totalCount] = await queryBuilder.getManyAndCount()
 
     const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
 
@@ -32,24 +38,31 @@ export class ServicesService {
   }
 
   async findOne(id: string) {
-    const service = await this.servicesRepository.findOne({
-      where: { id },
-    });
+    const queryBuilder = await this.servicesRepository.createQueryBuilder('services')
+      .leftJoinAndSelect('services.community', 'community')
+      .leftJoinAndSelect('services.type', 'type')
+      .leftJoinAndSelect('services.status', 'status')
+      .where('services.id = :id', { id })
+      .getOne()
 
-    if (!service) {
+    if (!queryBuilder) {
       throw new NotFoundException(`Service with ID ${id} not found`);
     }
 
-    return service;
+    return queryBuilder;
   }
 
-  async findByUser(userId: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
-    const [items, totalCount] = await this.servicesRepository.findAndCount({
-      where: { userId },
-      order: { date: pageOptionsDto.order },
-      skip: pageOptionsDto.skip,
-      take: pageOptionsDto.take,
-    });
+  async findByCleaner(userId: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
+    const queryBuilder = this.servicesRepository.createQueryBuilder('services')
+      .leftJoinAndSelect('services.community', 'community')
+      .leftJoinAndSelect('services.type', 'type')
+      .leftJoinAndSelect('services.status', 'status')
+      .where('services.userId = :userId', { userId })
+      .orderBy('services.date', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+
+    const [items, totalCount] = await queryBuilder.getManyAndCount()
 
     const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
 
@@ -58,8 +71,6 @@ export class ServicesService {
 
   async findByCommunities(servicesByManagerDto: ServicesByManagerDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
     const queryBuilder = this.servicesRepository.createQueryBuilder('services')
-
-    queryBuilder
       .leftJoinAndSelect('services.community', 'community')
       .leftJoinAndSelect('services.type', 'type')
       .leftJoinAndSelect('services.status', 'status')

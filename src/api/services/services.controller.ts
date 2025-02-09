@@ -33,11 +33,11 @@ export class ServicesController {
 
   @Post('/by-cleaner/:userId')
   @UseGuards(AuthGuard('jwt'))
-  findByUser(
+  findByCleaner(
     @Param('userId') userId: string,
     @Query() pageOptionsDto: PageOptionsDto,
   ) {
-    return this.servicesService.findByUser(userId, pageOptionsDto);
+    return this.servicesService.findByCleaner(userId, pageOptionsDto);
   }
 
   @Post('/by-communities')

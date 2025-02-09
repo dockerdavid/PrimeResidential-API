@@ -27,11 +27,25 @@ export class TypesService {
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<TypesEntity>> {
-    const [items, totalCount] = await this.typesRepository.findAndCount({
-      order: { createdAt: pageOptionsDto.order },
-      skip: pageOptionsDto.skip,
-      take: pageOptionsDto.take,
-    });
+    const queryBuilder = this.typesRepository.createQueryBuilder('types')
+      .innerJoinAndSelect('types.community', 'community')
+      .orderBy('types.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .select([
+        'types.id',
+        'types.description',
+        'types.cleaningType',
+        'types.price',
+        'types.commission',
+        'types.communityId',
+        'types.createdAt',
+        'types.updatedAt',
+        'community.id',
+        'community.communityName',
+      ]);
+
+    const [items, totalCount] = await queryBuilder.getManyAndCount();
 
     const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
 
@@ -39,9 +53,22 @@ export class TypesService {
   }
 
   async findOne(id: string) {
-    const type = await this.typesRepository.findOne({
-      where: { id },
-    });
+    const type = await this.typesRepository.createQueryBuilder('types')
+      .innerJoinAndSelect('types.community', 'community')
+      .where('types.id = :id', { id })
+      .select([
+        'types.id',
+        'types.description',
+        'types.cleaningType',
+        'types.price',
+        'types.commission',
+        'types.communityId',
+        'types.createdAt',
+        'types.updatedAt',
+        'community.id',
+        'community.communityName',
+      ])
+      .getOne();
 
     if (!type) {
       throw new NotFoundException(`Type with ID ${id} not found`);
