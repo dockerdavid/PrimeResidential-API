@@ -10,6 +10,7 @@ import { PageOptionsDto } from 'src/dto/page-options.dto';
 import { PageDto } from 'src/dto/page.dto';
 import { ServicesEntity } from 'src/entities/services.entity';
 import { ApiPaginatedResponse } from 'src/decorators/api-paginated-response.decorator';
+import { ServicesByManagerDto } from './dto/services-by-manager.dto';
 
 @ApiBearerAuth()
 @ApiTags('services')
@@ -30,13 +31,22 @@ export class ServicesController {
     return this.servicesService.findOne(id);
   }
 
-  @Post('/by-user/:userId')
+  @Post('/by-cleaner/:userId')
   @UseGuards(AuthGuard('jwt'))
   findByUser(
     @Param('userId') userId: string,
     @Query() pageOptionsDto: PageOptionsDto,
   ) {
     return this.servicesService.findByUser(userId, pageOptionsDto);
+  }
+
+  @Post('/by-communities')
+  @UseGuards(AuthGuard('jwt'))
+  findByCommunities(
+    @Query() pageOptionsDto: PageOptionsDto,
+    @Body() servicesByManagerDto: ServicesByManagerDto,
+  ): Promise<PageDto<ServicesEntity>> {
+    return this.servicesService.findByCommunities(servicesByManagerDto, pageOptionsDto);
   }
 
   @Post()

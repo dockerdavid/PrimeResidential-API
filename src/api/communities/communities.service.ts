@@ -39,6 +39,14 @@ export class CommunitiesService {
     return new PageDto(items, pageMetaDto);
   }
 
+  async findAllByManager(id: string) {
+    const communities = await this.communitiesRepository.find({
+      where: { userId: id },
+    });
+
+    return communities;
+  }
+
   async findOne(id: string) {
     const community = await this.communitiesRepository.findOne({
       where: { id },

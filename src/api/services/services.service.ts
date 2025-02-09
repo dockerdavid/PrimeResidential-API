@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
@@ -9,6 +9,7 @@ import { PageMetaDto } from 'src/dto/page-meta.dto';
 import { PageDto } from 'src/dto/page.dto';
 
 import { ServicesEntity } from 'src/entities/services.entity';
+import { ServicesByManagerDto } from './dto/services-by-manager.dto';
 
 @Injectable()
 export class ServicesService {
@@ -49,6 +50,25 @@ export class ServicesService {
       skip: pageOptionsDto.skip,
       take: pageOptionsDto.take,
     });
+
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
+  }
+
+  async findByCommunities(servicesByManagerDto: ServicesByManagerDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
+    const queryBuilder = this.servicesRepository.createQueryBuilder('services')
+
+    queryBuilder
+      .leftJoinAndSelect('services.community', 'community')
+      .leftJoinAndSelect('services.type', 'type')
+      .leftJoinAndSelect('services.status', 'status')
+      .where('services.communityId IN (:...communities)', { communities: servicesByManagerDto.communities })
+      .orderBy('services.date', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+
+    const [items, totalCount] = await queryBuilder.getManyAndCount()
 
     const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
 

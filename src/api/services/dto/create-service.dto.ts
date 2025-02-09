@@ -26,6 +26,14 @@ export class CreateServiceDto {
     comment?: string | null;
 
     @ApiProperty({
+        description: 'The cleaner comment of the service',
+        example: 'This is a comment',
+    })
+    @IsOptional()
+    @IsString()
+    userComment?: string | null;
+
+    @ApiProperty({
         description: 'The size of the unity',
         example: '1 Bedroom',
     })

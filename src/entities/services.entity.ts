@@ -31,6 +31,9 @@ export class ServicesEntity {
   @Column("text", { name: "comment", nullable: true })
   comment: string | null;
 
+  @Column("text", { name: "user_comment", nullable: true })
+  userComment: string | null;
+
   @Column("varchar", { name: "unity_size", length: 191 })
   unitySize: string;
 

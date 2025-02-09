@@ -38,6 +38,12 @@ export class CommunitiesController {
     return this.communitiesService.findOne(id);
   }
 
+  @Get('/by-manager/:id')
+  @UseGuards(AuthGuard('jwt'))
+  findAllByManager(@Param('id') id: string) {
+    return this.communitiesService.findAllByManager(id);
+  }
+
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
   update(@Param('id') id: string, @Body() updateCommunityDto: UpdateCommunityDto) {
