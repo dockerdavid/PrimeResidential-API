@@ -1,22 +1,26 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
 
+import { Repository } from 'typeorm';
+
+import { ServicesByManagerDto } from './dto/services-by-manager.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { PageOptionsDto } from 'src/dto/page-options.dto';
 import { PageMetaDto } from 'src/dto/page-meta.dto';
 import { PageDto } from 'src/dto/page.dto';
 
+import { ExtrasByServiceEntity } from 'src/entities/extras_by_service.entity';
 import { ServicesEntity } from 'src/entities/services.entity';
-import { ServicesByManagerDto } from './dto/services-by-manager.dto';
 
 @Injectable()
 export class ServicesService {
 
   constructor(
     @InjectRepository(ServicesEntity)
-    private readonly servicesRepository: Repository<ServicesEntity>
+    private readonly servicesRepository: Repository<ServicesEntity>,
+    @InjectRepository(ExtrasByServiceEntity)
+    private readonly extrasByServiceRepository: Repository<ExtrasByServiceEntity>,
   ) { }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
@@ -87,11 +91,18 @@ export class ServicesService {
   }
 
   async create(createServiceDto: CreateServiceDto) {
-    const service = this.servicesRepository.create(createServiceDto);
+    const { extraId, ...createServiceDtoCopy } = createServiceDto
+
+    const service = this.servicesRepository.create(createServiceDtoCopy);
+    const extra = this.extrasByServiceRepository.create({ serviceId: service.id, extraId })
 
     await this.servicesRepository.save(service);
+    await this.extrasByServiceRepository.save(extra);
 
-    return service;
+    return {
+      service,
+      extra,
+    }
   }
 
   async update(id: string, updateServiceDto: UpdateServiceDto) {

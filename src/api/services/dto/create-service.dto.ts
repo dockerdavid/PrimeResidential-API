@@ -75,4 +75,12 @@ export class CreateServiceDto {
     @IsOptional()
     @IsString()
     userId?: string | null;
+
+    @ApiProperty({
+        description: 'The id of the extra',
+        example: '1',
+    })
+    @IsOptional()
+    @IsString()
+    extraId?: string | null;
 }
