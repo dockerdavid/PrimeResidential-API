@@ -25,6 +25,16 @@ export class ServicesController {
     return this.servicesService.findAll(pageOptionsDto);
   }
 
+  @Get('/:statusID')
+  @ApiPaginatedResponse(ServicesEntity)
+  @UseGuards(AuthGuard('jwt'))
+  findAllByStatusID(
+    @Param('statusID') statusID: string,
+    @Query() pageOptionsDto: PageOptionsDto
+  ): Promise<PageDto<ServicesEntity>> {
+    return this.servicesService.findAllByStatusID(statusID, pageOptionsDto);
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   findOne(@Param('id') id: string) {

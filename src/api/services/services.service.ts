@@ -41,6 +41,25 @@ export class ServicesService {
     return new PageDto(items, pageMetaDto);
   }
 
+  async findAllByStatusID(statusID: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
+    const queryBuilder = this.servicesRepository.createQueryBuilder('services')
+
+    queryBuilder
+      .leftJoinAndSelect('services.community', 'community')
+      .leftJoinAndSelect('services.type', 'type')
+      .leftJoinAndSelect('services.status', 'status')
+      .orderBy('services.date', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where('services.statusId = :statusID', { statusID })
+
+    const [items, totalCount] = await queryBuilder.getManyAndCount()
+
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
+  }
+
   async findOne(id: string) {
     const queryBuilder = await this.servicesRepository.createQueryBuilder('services')
       .leftJoinAndSelect('services.community', 'community')
