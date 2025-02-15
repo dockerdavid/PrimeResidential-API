@@ -25,7 +25,7 @@ export class ServicesController {
     return this.servicesService.findAll(pageOptionsDto);
   }
 
-  @Get('/:statusID')
+  @Get('/by-status/:statusID')
   @ApiPaginatedResponse(ServicesEntity)
   @UseGuards(AuthGuard('jwt'))
   findAllByStatusID(
