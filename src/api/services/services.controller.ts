@@ -35,6 +35,17 @@ export class ServicesController {
     return this.servicesService.findAllByStatusID(statusID, pageOptionsDto);
   }
 
+  @Get('/by-role/:roleID/:statusID')
+  @ApiPaginatedResponse(ServicesEntity)
+  @UseGuards(AuthGuard('jwt'))
+  findAllByRoleIDStatusID(
+    @Param('roleID') roleID: string,
+    @Param('statusID') statusID: string,
+    @Query() pageOptionsDto: PageOptionsDto
+  ): Promise<PageDto<ServicesEntity>> {
+    return this.servicesService.findAllByRoleIDStatusID(roleID, statusID, pageOptionsDto);
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   findOne(@Param('id') id: string) {
