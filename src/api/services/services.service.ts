@@ -60,7 +60,7 @@ export class ServicesService {
     return new PageDto(items, pageMetaDto);
   }
 
-  async findAllByRoleIDStatusID(roleID: string, statusID: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
+  async findAllByUserIDStatusID(userID: string, statusID: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
     const queryBuilder = this.servicesRepository.createQueryBuilder('services')
 
     queryBuilder
@@ -72,7 +72,7 @@ export class ServicesService {
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
       .where('services.statusId = :statusID', { statusID })
-      .andWhere('user.roleId = :roleID', { roleID })
+      .andWhere('services.userId = :userID', { userID })
 
     const [items, totalCount] = await queryBuilder.getManyAndCount()
 

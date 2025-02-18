@@ -35,15 +35,15 @@ export class ServicesController {
     return this.servicesService.findAllByStatusID(statusID, pageOptionsDto);
   }
 
-  @Get('/by-role/:roleID/:statusID')
+  @Get('/by-user/:userID/:statusID')
   @ApiPaginatedResponse(ServicesEntity)
   @UseGuards(AuthGuard('jwt'))
-  findAllByRoleIDStatusID(
-    @Param('roleID') roleID: string,
+  findAllByUserIDStatusID(
+    @Param('userID') userID: string,
     @Param('statusID') statusID: string,
     @Query() pageOptionsDto: PageOptionsDto
   ): Promise<PageDto<ServicesEntity>> {
-    return this.servicesService.findAllByRoleIDStatusID(roleID, statusID, pageOptionsDto);
+    return this.servicesService.findAllByUserIDStatusID(userID, statusID, pageOptionsDto);
   }
 
   @Get(':id')
