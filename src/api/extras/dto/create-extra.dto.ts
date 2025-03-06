@@ -1,11 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class CreateExtraDto {
     @ApiProperty({
         description: 'Nombre o descripción del extra',
         example: 'Servicio de instalación adicional',
     })
+    @IsString()
     item: string;
 
     @ApiProperty({

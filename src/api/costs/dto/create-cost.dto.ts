@@ -1,12 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDecimal, IsString } from "class-validator";
+import { IsDateString, IsString } from "class-validator";
 
 export class CreateCostDto {
     @ApiProperty({
         description: 'Fecha del costo',
         example: '2025-02-07',
     })
-    @IsString()
+    @IsDateString()
     date: string;
 
     @ApiProperty({
