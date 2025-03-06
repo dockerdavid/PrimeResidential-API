@@ -28,8 +28,8 @@ export class CommunitiesController {
 
   @Post('/search')
   @UseGuards(AuthGuard('jwt'))
-  searchByWord(@Body() searchDto: SearchDto) {
-    return this.communitiesService.searchByWord(searchDto);
+  searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto) {
+    return this.communitiesService.searchByWord(searchDto, pageOptionsDto);
   }
 
   @Get()
