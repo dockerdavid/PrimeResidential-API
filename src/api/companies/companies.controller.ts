@@ -28,8 +28,8 @@ export class CompaniesController {
 
   @Post('/search')
   @UseGuards(AuthGuard('jwt'))
-  searchByWord(@Body() searchDto: SearchDto) {
-    return this.companiesService.searchByWord(searchDto);
+  searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<CompaniesEntity>> {
+    return this.companiesService.searchByWord(searchDto, pageOptionsDto);
   }
 
   @Get()
