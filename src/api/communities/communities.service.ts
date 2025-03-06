@@ -28,18 +28,40 @@ export class CommunitiesService {
     return community;
   }
 
-  async searchByWord(searchDto: SearchDto) {
+  async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<CommunitiesEntity>> {
     const searchedItemsByWord = this.communitiesRepository.createQueryBuilder('communities')
-      .where('communities.communityName like :searchWord', {
-        searchWord: `%${searchDto.searchWord}%`,
-      })
-      .getMany();
+      .innerJoinAndSelect('communities.user', 'user')
+      .innerJoinAndSelect('communities.company', 'company')
+      .innerJoinAndSelect('user.role', 'role')
+      .orderBy('communities.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .select([
+        'communities.id',
+        'communities.communityName',
+        'communities.createdAt',
+        'communities.updatedAt',
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.phoneNumber',
+        'company.id',
+        'company.companyName',
+        'role.id',
+        'role.name',
+      ])
+      .where('communities.communityName like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('user.name like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('user.email like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('user.phoneNumber like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('company.companyName like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('role.name like :searchWord', { searchWord: `%${searchDto.searchWord}%` });
 
-    if (!searchedItemsByWord) {
-      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
-    }
+    const [items, totalCount] = await searchedItemsByWord.getManyAndCount();
 
-    return searchedItemsByWord;
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<CommunitiesEntity>> {
