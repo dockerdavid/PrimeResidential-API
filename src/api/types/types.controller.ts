@@ -12,6 +12,7 @@ import { PageDto } from 'src/dto/page.dto';
 import { TypesService } from './types.service';
 
 import { TypesEntity } from 'src/entities/types.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @ApiBearerAuth()
 @ApiTags('types')
@@ -23,6 +24,12 @@ export class TypesController {
   @UseGuards(AuthGuard('jwt'))
   create(@Body() createTypeDto: CreateTypeDto) {
     return this.typesService.create(createTypeDto);
+  }
+
+  @Post('/search')
+  @UseGuards(AuthGuard('jwt'))
+  searchByWord(@Body() searchDto: SearchDto) {
+    return this.typesService.searchByWord(searchDto);
   }
 
   @Get()

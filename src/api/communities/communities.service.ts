@@ -10,6 +10,7 @@ import { PageMetaDto } from 'src/dto/page-meta.dto';
 import { PageDto } from 'src/dto/page.dto';
 
 import { CommunitiesEntity } from 'src/entities/communities.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @Injectable()
 export class CommunitiesService {
@@ -25,6 +26,20 @@ export class CommunitiesService {
     await this.communitiesRepository.save(community);
 
     return community;
+  }
+
+  async searchByWord(searchDto: SearchDto) {
+    const searchedItemsByWord = this.communitiesRepository.createQueryBuilder('communities')
+      .where('communities.communityName like :searchWord', {
+        searchWord: `%${searchDto.searchWord}%`,
+      })
+      .getMany();
+
+    if (!searchedItemsByWord) {
+      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
+    }
+
+    return searchedItemsByWord;
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<CommunitiesEntity>> {

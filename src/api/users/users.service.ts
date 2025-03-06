@@ -12,6 +12,7 @@ import { PageDto } from 'src/dto/page.dto';
 
 import { RolesEntity } from 'src/entities/roles.entity';
 import { UsersEntity } from 'src/entities/users.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @Injectable()
 export class UsersService {
@@ -31,6 +32,20 @@ export class UsersService {
     await this.usersRepository.save(user);
 
     return user;
+  }
+
+  async searchByWord(searchDto: SearchDto) {
+    const searchedItemsByWord = this.usersRepository.createQueryBuilder('users')
+      .where('users.name LIKE :searchWord', {
+        searchWord: `%${searchDto.searchWord}%`,
+      })
+      .getMany();
+
+    if (!searchedItemsByWord) {
+      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
+    }
+
+    return searchedItemsByWord;
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UsersEntity>> {

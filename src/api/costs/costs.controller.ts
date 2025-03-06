@@ -12,6 +12,7 @@ import { PageDto } from 'src/dto/page.dto';
 import { CostsService } from './costs.service';
 
 import { CostsEntity } from 'src/entities/costs.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @ApiBearerAuth()
 @ApiTags('costs')
@@ -23,6 +24,12 @@ export class CostsController {
   @UseGuards(AuthGuard('jwt'))
   create(@Body() createCostDto: CreateCostDto) {
     return this.costsService.create(createCostDto);
+  }
+
+  @Post('/search')
+  @UseGuards(AuthGuard('jwt'))
+  searchByWord(@Body() searchDto: SearchDto) {
+    return this.costsService.searchByWord(searchDto);
   }
 
   @Get()

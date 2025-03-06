@@ -10,6 +10,7 @@ import { PageMetaDto } from 'src/dto/page-meta.dto';
 import { PageDto } from 'src/dto/page.dto';
 
 import { CostsEntity } from 'src/entities/costs.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @Injectable()
 export class CostsService {
@@ -24,6 +25,20 @@ export class CostsService {
     await this.costsRepository.save(cost);
 
     return cost;
+  }
+
+  async searchByWord(searchDto: SearchDto) {
+    const searchedItemsByWord = this.costsRepository.createQueryBuilder('costs')
+      .where('costs.description LIKE :searchWord', {
+        searchWord: `%${searchDto.searchWord}%`,
+      })
+      .getMany();
+
+    if (!searchedItemsByWord) {
+      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
+    }
+
+    return searchedItemsByWord;
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<CostsEntity>> {

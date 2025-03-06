@@ -12,6 +12,7 @@ import { PageDto } from 'src/dto/page.dto';
 import { StatusesService } from './statuses.service';
 
 import { StatusesEntity } from 'src/entities/statuses.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @ApiBearerAuth()
 @ApiTags('statuses')
@@ -23,6 +24,12 @@ export class StatusesController {
   @UseGuards(AuthGuard('jwt'))
   create(@Body() createStatusDto: CreateStatusDto) {
     return this.statusesService.create(createStatusDto);
+  }
+
+  @Post('/search')
+  @UseGuards(AuthGuard('jwt'))
+  searchByWord(@Body() searchDto: SearchDto) {
+    return this.statusesService.searchByWord(searchDto);
   }
 
   @Get()

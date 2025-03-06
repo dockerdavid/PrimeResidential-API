@@ -10,6 +10,7 @@ import { PageMetaDto } from 'src/dto/page-meta.dto';
 import { PageDto } from 'src/dto/page.dto';
 
 import { StatusesEntity } from 'src/entities/statuses.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @Injectable()
 export class StatusesService {
@@ -24,6 +25,20 @@ export class StatusesService {
     await this.statusesRepository.save(statuses);
 
     return statuses;
+  }
+
+  async searchByWord(searchDto: SearchDto) {
+    const searchedItemsByWord = this.statusesRepository.createQueryBuilder('statuses')
+      .where('statuses.statusName LIKE :searchWord', {
+        searchWord: `%${searchDto.searchWord}%`,
+      })
+      .getMany();
+
+    if (!searchedItemsByWord) {
+      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
+    }
+
+    return searchedItemsByWord;
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<StatusesEntity>> {

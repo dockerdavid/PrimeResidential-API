@@ -12,6 +12,7 @@ import { PageDto } from 'src/dto/page.dto';
 
 import { ExtrasByServiceEntity } from 'src/entities/extras_by_service.entity';
 import { ServicesEntity } from 'src/entities/services.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @Injectable()
 export class ServicesService {
@@ -22,6 +23,20 @@ export class ServicesService {
     @InjectRepository(ExtrasByServiceEntity)
     private readonly extrasByServiceRepository: Repository<ExtrasByServiceEntity>,
   ) { }
+
+  async searchByWord(searchDto: SearchDto) {
+    const searchedItemsByWord = this.servicesRepository.createQueryBuilder('services')
+      .where('services.comment LIKE :searchWord', {
+        searchWord: `%${searchDto.searchWord}%`,
+      })
+      .getMany();
+
+    if (!searchedItemsByWord) {
+      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
+    }
+
+    return searchedItemsByWord;
+  }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
     const queryBuilder = this.servicesRepository.createQueryBuilder('services')

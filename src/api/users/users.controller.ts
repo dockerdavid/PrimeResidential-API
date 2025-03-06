@@ -12,6 +12,7 @@ import { PageDto } from 'src/dto/page.dto';
 
 import { UsersEntity } from 'src/entities/users.entity';
 import { PageOptionsDto } from 'src/dto/page-options.dto';
+import { SearchDto } from 'src/dto/search.dto';
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -23,6 +24,12 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
+  }
+
+  @Post('/search')
+  @UseGuards(AuthGuard('jwt'))
+  searchByWord(@Body() searchDto: SearchDto) {
+    return this.usersService.searchByWord(searchDto);
   }
 
   @Get()

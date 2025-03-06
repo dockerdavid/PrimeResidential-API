@@ -10,6 +10,7 @@ import { PageMetaDto } from 'src/dto/page-meta.dto';
 import { PageDto } from 'src/dto/page.dto';
 
 import { TypesEntity } from 'src/entities/types.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @Injectable()
 export class TypesService {
@@ -24,6 +25,20 @@ export class TypesService {
     await this.typesRepository.save(type);
 
     return type;
+  }
+
+  async searchByWord(searchDto: SearchDto) {
+    const searchedItemsByWord = this.typesRepository.createQueryBuilder('types')
+      .where('types.description LIKE :searchWord', {
+        searchWord: `%${searchDto.searchWord}%`,
+      })
+      .getMany();
+
+    if (!searchedItemsByWord) {
+      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
+    }
+
+    return searchedItemsByWord;
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<TypesEntity>> {

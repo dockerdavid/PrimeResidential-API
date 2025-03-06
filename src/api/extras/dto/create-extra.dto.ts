@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDecimal } from "class-validator";
+import { IsNumber } from "class-validator";
 
 export class CreateExtraDto {
     @ApiProperty({
@@ -12,12 +12,13 @@ export class CreateExtraDto {
         description: 'Precio del extra',
         example: 49.99,
     })
-    @IsDecimal()
+    @IsNumber({ maxDecimalPlaces: 2 })
     itemPrice: number;
 
     @ApiProperty({
         description: 'Comisión del extra (valor decimal). Si no se especifica, el valor por defecto es "0.00"',
-        example: '0.00',
+        example: 0.00,
     })
-    commission: string;
+    @IsNumber({ maxDecimalPlaces: 2 })
+    commission: number;
 }

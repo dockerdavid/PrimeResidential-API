@@ -12,6 +12,7 @@ import { PageDto } from 'src/dto/page.dto';
 import { CompaniesService } from './companies.service';
 
 import { CompaniesEntity } from 'src/entities/companies.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @ApiBearerAuth()
 @ApiTags('companies')
@@ -23,6 +24,12 @@ export class CompaniesController {
   @UseGuards(AuthGuard('jwt'))
   create(@Body() createCompanyDto: CreateCompanyDto) {
     return this.companiesService.create(createCompanyDto);
+  }
+
+  @Post('/search')
+  @UseGuards(AuthGuard('jwt'))
+  searchByWord(@Body() searchDto: SearchDto) {
+    return this.companiesService.searchByWord(searchDto);
   }
 
   @Get()

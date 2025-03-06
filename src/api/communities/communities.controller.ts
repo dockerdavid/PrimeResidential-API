@@ -12,6 +12,7 @@ import { PageDto } from 'src/dto/page.dto';
 import { CommunitiesService } from './communities.service';
 
 import { CommunitiesEntity } from 'src/entities/communities.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @ApiBearerAuth()
 @ApiTags('communities')
@@ -23,6 +24,12 @@ export class CommunitiesController {
   @UseGuards(AuthGuard('jwt'))
   create(@Body() createCommunityDto: CreateCommunityDto) {
     return this.communitiesService.create(createCommunityDto);
+  }
+
+  @Post('/search')
+  @UseGuards(AuthGuard('jwt'))
+  searchByWord(@Body() searchDto: SearchDto) {
+    return this.communitiesService.searchByWord(searchDto);
   }
 
   @Get()

@@ -12,6 +12,7 @@ import { PageDto } from 'src/dto/page.dto';
 import { ExtrasService } from './extras.service';
 
 import { ExtrasEntity } from 'src/entities/extras.entity';
+import { SearchDto } from 'src/dto/search.dto';
 
 @ApiBearerAuth()
 @ApiTags('extras')
@@ -23,6 +24,12 @@ export class ExtrasController {
   @UseGuards(AuthGuard('jwt'))
   create(@Body() createExtraDto: CreateExtraDto) {
     return this.extrasService.create(createExtraDto);
+  }
+
+  @Post('/search')
+  @UseGuards(AuthGuard('jwt'))
+  searchByWord(@Body() searchDto: SearchDto) {
+    return this.extrasService.searchByWord(searchDto);
   }
 
   @Get()

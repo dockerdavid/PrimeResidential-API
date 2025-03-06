@@ -11,12 +11,19 @@ import { PageDto } from 'src/dto/page.dto';
 import { ServicesEntity } from 'src/entities/services.entity';
 import { ApiPaginatedResponse } from 'src/decorators/api-paginated-response.decorator';
 import { ServicesByManagerDto } from './dto/services-by-manager.dto';
+import { SearchDto } from 'src/dto/search.dto';
 
 @ApiBearerAuth()
 @ApiTags('services')
 @Controller('services')
 export class ServicesController {
   constructor(private readonly servicesService: ServicesService) { }
+
+  @Post('/search')
+  @UseGuards(AuthGuard('jwt'))
+  searchByWord(@Body() searchDto: SearchDto) {
+    return this.servicesService.searchByWord(searchDto);
+  }
 
   @Get('')
   @ApiPaginatedResponse(ServicesEntity)

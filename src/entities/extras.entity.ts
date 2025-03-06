@@ -18,7 +18,7 @@ export class ExtrasEntity {
     scale: 2,
     default: () => "'0.00'",
   })
-  commission: string;
+  commission: number;
 
   @Column("timestamp", {
     name: "created_at",
