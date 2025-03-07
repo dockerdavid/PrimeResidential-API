@@ -27,18 +27,26 @@ export class ExtrasService {
     return extra;
   }
 
-  async searchByWord(searchDto: SearchDto) {
+  async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<ExtrasEntity>> {
     const searchedItemsByWord = this.extrasRepository.createQueryBuilder('extras')
+      .orderBy('extras.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
       .where('extras.item LIKE :searchWord', {
         searchWord: `%${searchDto.searchWord}%`,
       })
-      .getMany();
+      .orWhere('extras.itemPrice LIKE :searchWord', {
+        searchWord: `%${searchDto.searchWord}%`,
+      })
+      .orWhere('extras.commission LIKE :searchWord', {
+        searchWord: `%${searchDto.searchWord}%`,
+      })
 
-    if (!searchedItemsByWord) {
-      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
-    }
+    const [items, totalCount] = await searchedItemsByWord.getManyAndCount();
 
-    return searchedItemsByWord;
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ExtrasEntity>> {

@@ -27,18 +27,20 @@ export class CostsService {
     return cost;
   }
 
-  async searchByWord(searchDto: SearchDto) {
+  async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<CostsEntity>> {
     const searchedItemsByWord = this.costsRepository.createQueryBuilder('costs')
-      .where('costs.description LIKE :searchWord', {
-        searchWord: `%${searchDto.searchWord}%`,
-      })
-      .getMany();
+      .orderBy('costs.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where('costs.date LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('costs.description LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('costs.amount LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
 
-    if (!searchedItemsByWord) {
-      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
-    }
+    const [items, totalCount] = await searchedItemsByWord.getManyAndCount();
 
-    return searchedItemsByWord;
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<CostsEntity>> {

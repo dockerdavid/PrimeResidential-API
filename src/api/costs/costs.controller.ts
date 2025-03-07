@@ -28,8 +28,8 @@ export class CostsController {
 
   @Post('/search')
   @UseGuards(AuthGuard('jwt'))
-  searchByWord(@Body() searchDto: SearchDto) {
-    return this.costsService.searchByWord(searchDto);
+  searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<CostsEntity>> {
+    return this.costsService.searchByWord(searchDto, pageOptionsDto);
   }
 
   @Get()

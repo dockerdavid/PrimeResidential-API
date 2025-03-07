@@ -28,8 +28,8 @@ export class ExtrasController {
 
   @Post('/search')
   @UseGuards(AuthGuard('jwt'))
-  searchByWord(@Body() searchDto: SearchDto) {
-    return this.extrasService.searchByWord(searchDto);
+  searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<ExtrasEntity>> {
+    return this.extrasService.searchByWord(searchDto, pageOptionsDto);
   }
 
   @Get()

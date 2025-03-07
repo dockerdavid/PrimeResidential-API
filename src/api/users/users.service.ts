@@ -34,18 +34,32 @@ export class UsersService {
     return user;
   }
 
-  async searchByWord(searchDto: SearchDto) {
+  async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<UsersEntity>> {
     const searchedItemsByWord = this.usersRepository.createQueryBuilder('users')
-      .where('users.name LIKE :searchWord', {
-        searchWord: `%${searchDto.searchWord}%`,
-      })
-      .getMany();
+      .innerJoinAndSelect('users.role', 'role')
+      .orderBy('users.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .select([
+        'users.id',
+        'users.name',
+        'users.email',
+        'users.phoneNumber',
+        'users.roleId',
+        'users.createdAt',
+        'role.id',
+        'role.name',
+      ])
+      .where('users.name LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('users.email LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('users.phoneNumber LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('role.name LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
 
-    if (!searchedItemsByWord) {
-      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
-    }
+    const [items, totalCount] = await searchedItemsByWord.getManyAndCount();
 
-    return searchedItemsByWord;
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UsersEntity>> {

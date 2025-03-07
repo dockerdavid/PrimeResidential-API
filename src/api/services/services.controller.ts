@@ -21,8 +21,8 @@ export class ServicesController {
 
   @Post('/search')
   @UseGuards(AuthGuard('jwt'))
-  searchByWord(@Body() searchDto: SearchDto) {
-    return this.servicesService.searchByWord(searchDto);
+  searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<ServicesEntity>> {
+    return this.servicesService.searchByWord(searchDto, pageOptionsDto);
   }
 
   @Get('')

@@ -28,8 +28,8 @@ export class TypesController {
 
   @Post('/search')
   @UseGuards(AuthGuard('jwt'))
-  searchByWord(@Body() searchDto: SearchDto) {
-    return this.typesService.searchByWord(searchDto);
+  searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto) {
+    return this.typesService.searchByWord(searchDto, pageOptionsDto);
   }
 
   @Get()

@@ -24,18 +24,26 @@ export class ServicesService {
     private readonly extrasByServiceRepository: Repository<ExtrasByServiceEntity>,
   ) { }
 
-  async searchByWord(searchDto: SearchDto) {
+  async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
     const searchedItemsByWord = this.servicesRepository.createQueryBuilder('services')
-      .where('services.comment LIKE :searchWord', {
-        searchWord: `%${searchDto.searchWord}%`,
-      })
-      .getMany();
+      .leftJoinAndSelect('services.community', 'community')
+      .leftJoinAndSelect('services.type', 'type')
+      .leftJoinAndSelect('services.status', 'status')
+      .orderBy('services.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .where('services.date LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('services.schedule LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('services.comment LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('services.userComment LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('services.unitySize LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('services.unitNumber LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
 
-    if (!searchedItemsByWord) {
-      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
-    }
+    const [items, totalCount] = await searchedItemsByWord.getManyAndCount()
 
-    return searchedItemsByWord;
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {

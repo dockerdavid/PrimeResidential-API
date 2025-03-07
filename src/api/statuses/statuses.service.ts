@@ -27,18 +27,20 @@ export class StatusesService {
     return statuses;
   }
 
-  async searchByWord(searchDto: SearchDto) {
+  async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<StatusesEntity>> {
     const searchedItemsByWord = this.statusesRepository.createQueryBuilder('statuses')
+      .orderBy('statuses.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
       .where('statuses.statusName LIKE :searchWord', {
         searchWord: `%${searchDto.searchWord}%`,
       })
-      .getMany();
 
-    if (!searchedItemsByWord) {
-      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
-    }
+    const [items, totalCount] = await searchedItemsByWord.getManyAndCount();
 
-    return searchedItemsByWord;
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<StatusesEntity>> {

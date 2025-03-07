@@ -28,8 +28,8 @@ export class StatusesController {
 
   @Post('/search')
   @UseGuards(AuthGuard('jwt'))
-  searchByWord(@Body() searchDto: SearchDto) {
-    return this.statusesService.searchByWord(searchDto);
+  searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<StatusesEntity>> {
+    return this.statusesService.searchByWord(searchDto, pageOptionsDto);
   }
 
   @Get()

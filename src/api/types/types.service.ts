@@ -27,18 +27,35 @@ export class TypesService {
     return type;
   }
 
-  async searchByWord(searchDto: SearchDto) {
+  async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<TypesEntity>> {
     const searchedItemsByWord = this.typesRepository.createQueryBuilder('types')
-      .where('types.description LIKE :searchWord', {
-        searchWord: `%${searchDto.searchWord}%`,
-      })
-      .getMany();
+      .innerJoinAndSelect('types.community', 'community')
+      .orderBy('types.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .select([
+        'types.id',
+        'types.description',
+        'types.cleaningType',
+        'types.price',
+        'types.commission',
+        'types.communityId',
+        'types.createdAt',
+        'types.updatedAt',
+        'community.id',
+        'community.communityName',
+      ])
+      .where('types.description LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('types.cleaningType LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('types.price LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('types.commission LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('community.communityName LIKE :searchWord', { searchWord: `%${searchDto.searchWord}%` });
 
-    if (!searchedItemsByWord) {
-      throw new NotFoundException(`The search word ${searchDto.searchWord} was not found`);
-    }
+    const [items, totalCount] = await searchedItemsByWord.getManyAndCount();
 
-    return searchedItemsByWord;
+    const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
+
+    return new PageDto(items, pageMetaDto);
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<TypesEntity>> {
