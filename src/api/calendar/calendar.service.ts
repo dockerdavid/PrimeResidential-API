@@ -1,26 +1,58 @@
+import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { CreateCalendarDto } from './dto/create-calendar.dto';
-import { UpdateCalendarDto } from './dto/update-calendar.dto';
+
+import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
+import * as moment from 'moment';
+
+import { ServicesEntity } from 'src/entities/services.entity';
 
 @Injectable()
 export class CalendarService {
-  create(createCalendarDto: CreateCalendarDto) {
-    return 'This action adds a new calendar';
-  }
+  constructor(
+    @InjectRepository(ServicesEntity)
+    private readonly servicesRepository: Repository<ServicesEntity>,
+  ) { }
 
-  findAll() {
-    return `This action returns all calendar`;
-  }
+  async findOne(id: string) {
+    const date = moment().format('YYYY-MM-DD');
 
-  findOne(id: number) {
-    return `This action returns a #${id} calendar`;
-  }
+    if (id === 'day') {
+      return this.servicesRepository.find({ where: { date } });
+    }
 
-  update(id: number, updateCalendarDto: UpdateCalendarDto) {
-    return `This action updates a #${id} calendar`;
-  }
+    if (id === 'week') {
+      const startOfWeek = moment().startOf('isoWeek').format('YYYY-MM-DD');
+      const endOfWeek = moment().endOf('isoWeek').format('YYYY-MM-DD');
 
-  remove(id: number) {
-    return `This action removes a #${id} calendar`;
+      return this.servicesRepository.find({
+        where: {
+          date: Between(startOfWeek, endOfWeek),
+        },
+      });
+    }
+
+    if (id === 'month') {
+      const startOfMonth = moment().startOf('month').format('YYYY-MM-DD');
+      const endOfMonth = moment().endOf('month').format('YYYY-MM-DD');
+
+      return this.servicesRepository.find({
+        where: {
+          date: Between(startOfMonth, endOfMonth),
+        },
+      });
+    }
+
+    if (id === 'year') {
+      const startOfYear = moment().startOf('year').format('YYYY-MM-DD');
+      const endOfYear = moment().endOf('year').format('YYYY-MM-DD');
+
+      return this.servicesRepository.find({
+        where: {
+          date: Between(startOfYear, endOfYear),
+        },
+      });
+    }
+
+    return [];
   }
 }

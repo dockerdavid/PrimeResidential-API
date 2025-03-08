@@ -1,34 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiQuery } from '@nestjs/swagger';
+
 import { CalendarService } from './calendar.service';
-import { CreateCalendarDto } from './dto/create-calendar.dto';
-import { UpdateCalendarDto } from './dto/update-calendar.dto';
+
+import { CalendarEnum } from './dto/calendar.dto';
 
 @Controller('calendar')
 export class CalendarController {
-  constructor(private readonly calendarService: CalendarService) {}
-
-  @Post()
-  create(@Body() createCalendarDto: CreateCalendarDto) {
-    return this.calendarService.create(createCalendarDto);
-  }
-
+  constructor(private readonly calendarService: CalendarService) { }
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    enum: CalendarEnum,
+    description: 'Calendar type',
+  })
   @Get()
-  findAll() {
-    return this.calendarService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.calendarService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCalendarDto: UpdateCalendarDto) {
-    return this.calendarService.update(+id, updateCalendarDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.calendarService.remove(+id);
+  findOne(@Query('type') type: string) {
+    return this.calendarService.findOne(type);
   }
 }

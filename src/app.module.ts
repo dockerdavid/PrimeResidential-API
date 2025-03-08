@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common';
 
 import { CommunitiesModule } from './api/communities/communities.module';
 import { CompaniesModule } from './api/companies/companies.module';
-import { DashboardModule } from './api/dashboard/dashboard.module';
 import { ServicesModule } from './api/services/services.module';
 import { CalendarModule } from './api/calendar/calendar.module';
 import { StatusesModule } from './api/statuses/statuses.module';
@@ -35,7 +34,6 @@ import envVars from './config/env';
     ExtrasModule,
     StatusesModule,
     TypesModule,
-    DashboardModule,
     CalendarModule,
   ],
   controllers: [],
