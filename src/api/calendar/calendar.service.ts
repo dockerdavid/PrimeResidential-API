@@ -14,7 +14,7 @@ export class CalendarService {
   async findOne(id: string) {
     const date = moment().format('YYYY-MM-DD');
 
-    let whereCondition: any;
+    let whereCondition;
 
     if (id === 'day') {
       whereCondition = { date };
@@ -43,9 +43,16 @@ export class CalendarService {
       return [];
     }
 
-    return this.servicesRepository.find({
+    const services = await this.servicesRepository.find({
       where: whereCondition,
       relations: ['community', 'type', 'status', 'user'],
+    });
+
+    return services.map(service => {
+      if (service.user) {
+        delete service.user.password;
+      }
+      return service;
     });
   }
 }
