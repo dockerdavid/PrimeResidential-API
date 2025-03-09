@@ -77,6 +77,16 @@ export class ServicesController {
     return this.servicesService.findByCommunities(servicesByManagerDto, pageOptionsDto);
   }
 
+  @Post('/by-status/:statusID')
+  @UseGuards(AuthGuard('jwt'))
+  findByStatus(
+    @Param('statusID') statusID: string,
+    @Query() pageOptionsDto: PageOptionsDto,
+    @Body() servicesByManagerDto: ServicesByManagerDto,
+  ): Promise<PageDto<ServicesEntity>> {
+    return this.servicesService.findByStatus(servicesByManagerDto, statusID, pageOptionsDto);
+  }
+
   @Post()
   @UseGuards(AuthGuard('jwt'))
   create(@Body() createServiceDto: CreateServiceDto) {
