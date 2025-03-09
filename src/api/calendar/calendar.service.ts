@@ -45,7 +45,7 @@ export class CalendarService {
 
     return this.servicesRepository.find({
       where: whereCondition,
-      relations: ['community', 'type', 'status'],
+      relations: ['community', 'type', 'status', 'user'],
     });
   }
 }
