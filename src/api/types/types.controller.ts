@@ -45,6 +45,12 @@ export class TypesController {
     return this.typesService.findOne(id);
   }
 
+  @Get('/by-community/:id')
+  @UseGuards(AuthGuard('jwt'))
+  findByCommunities(@Param('id') id: string) {
+    return this.typesService.findByCommunities(id);
+  }
+
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
   update(@Param('id') id: string, @Body() updateTypeDto: UpdateTypeDto) {

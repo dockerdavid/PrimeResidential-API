@@ -109,6 +109,31 @@ export class TypesService {
     return type;
   }
 
+  async findByCommunities(id: string) {
+    const type = await this.typesRepository.createQueryBuilder('types')
+      .innerJoinAndSelect('types.community', 'community')
+      .where('types.communityId = :id', { id })
+      .select([
+        'types.id',
+        'types.description',
+        'types.cleaningType',
+        'types.price',
+        'types.commission',
+        'types.communityId',
+        'types.createdAt',
+        'types.updatedAt',
+        'community.id',
+        'community.communityName',
+      ])
+      .getOne();
+
+    if (!type) {
+      throw new NotFoundException(`Type with ID ${id} not found`);
+    }
+
+    return type;
+  }
+
   async update(id: string, updateTypeDto: UpdateTypeDto) {
     const type = await this.typesRepository.preload({
       id,
