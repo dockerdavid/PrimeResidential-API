@@ -125,7 +125,7 @@ export class TypesService {
         'community.id',
         'community.communityName',
       ])
-      .getOne();
+      .getMany();
 
     if (!type) {
       throw new NotFoundException(`Type with ID ${id} not found`);
