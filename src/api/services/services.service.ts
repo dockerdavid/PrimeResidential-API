@@ -176,18 +176,23 @@ export class ServicesService {
   }
 
   async create(createServiceDto: CreateServiceDto) {
-    const { extraId, ...createServiceDtoCopy } = createServiceDto
+    const { extraId, ...createServiceDtoCopy } = createServiceDto;
 
     const service = this.servicesRepository.create(createServiceDtoCopy);
-    const extra = this.extrasByServiceRepository.create({ serviceId: service.id, extraId })
-
     await this.servicesRepository.save(service);
-    await this.extrasByServiceRepository.save(extra);
+
+    let extras = [];
+    if (Array.isArray(extraId) && extraId.length > 0) {
+      extras = extraId.map(id =>
+        this.extrasByServiceRepository.create({ serviceId: service.id, extraId: id })
+      );
+      await this.extrasByServiceRepository.save(extras);
+    }
 
     return {
       service,
-      extra,
-    }
+      extras,
+    };
   }
 
   async update(id: string, updateServiceDto: UpdateServiceDto) {

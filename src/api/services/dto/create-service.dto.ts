@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class CreateServiceDto {
     @ApiProperty({
@@ -77,10 +77,11 @@ export class CreateServiceDto {
     userId?: string | null;
 
     @ApiProperty({
-        description: 'The id of the extra',
-        example: '1',
+        description: 'The ids of the extras',
+        example: ['1', '2'],
     })
     @IsOptional()
-    @IsString()
-    extraId?: string | null;
+    @IsArray()
+    @IsString({ each: true })
+    extraId?: string[] | null;
 }
