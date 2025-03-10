@@ -10,6 +10,7 @@ import {
 import { CommunitiesEntity } from "./communities.entity";
 import { ServicesEntity } from "./services.entity";
 import { RolesEntity } from "./roles.entity";
+import { Exclude } from "class-transformer";
 
 @Index("role_id", ["roleId"], {})
 @Entity("users", { schema: "services_dbqa" })
@@ -30,6 +31,7 @@ export class UsersEntity {
   roleId: string;
 
   @Column("varchar", { name: "password", length: 255 })
+  @Exclude()
   password: string;
 
   @Column("timestamp", {
