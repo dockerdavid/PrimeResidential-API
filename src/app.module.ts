@@ -27,6 +27,8 @@ import envVars from './config/env';
       password: envVars.DB_PASSWORD,
       database: envVars.DB_DATABASE,
       entities: [__dirname + '/entities/*.entity{.ts,.js}'],
+      synchronize: true,
+      autoLoadEntities: true,
     }),
     AuthModule,
     ServicesModule,

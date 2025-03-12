@@ -5,12 +5,11 @@ import { Repository } from 'typeorm';
 
 import { CreateExtraDto } from './dto/create-extra.dto';
 import { UpdateExtraDto } from './dto/update-extra.dto';
-import { PageOptionsDto } from 'src/dto/page-options.dto';
-import { PageMetaDto } from 'src/dto/page-meta.dto';
-import { PageDto } from 'src/dto/page.dto';
-
-import { ExtrasEntity } from 'src/entities/extras.entity';
-import { SearchDto } from 'src/dto/search.dto';
+import { ExtrasEntity } from '../../entities/extras.entity';
+import { SearchDto } from '../../dto/search.dto';
+import { PageOptionsDto } from '../../dto/page-options.dto';
+import { PageDto } from '../../dto/page.dto';
+import { PageMetaDto } from '../../dto/page-meta.dto';
 
 @Injectable()
 export class ExtrasService {

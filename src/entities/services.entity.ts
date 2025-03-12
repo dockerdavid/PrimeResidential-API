@@ -8,10 +8,10 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { ExtrasByServiceEntity } from "./extras_by_service.entity";
-import { CommunitiesEntity } from "./communities.entity";
-import { TypesEntity } from "./types.entity";
 import { StatusesEntity } from "./statuses.entity";
+import { CommunitiesEntity } from "./communities.entity";
 import { UsersEntity } from "./users.entity";
+import { TypesEntity } from "./types.entity";
 
 @Index("community_id", ["communityId"], {})
 @Index("status_id", ["statusId"], {})
@@ -71,21 +71,6 @@ export class ServicesEntity {
   extrasByServices: ExtrasByServiceEntity[];
 
   @ManyToOne(
-    () => CommunitiesEntity,
-    (communitiesEntity) => communitiesEntity.services,
-    { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
-  )
-  @JoinColumn([{ name: "community_id", referencedColumnName: "id" }])
-  community: CommunitiesEntity;
-
-  @ManyToOne(() => TypesEntity, (typesEntity) => typesEntity.services, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "type_id", referencedColumnName: "id" }])
-  type: TypesEntity;
-
-  @ManyToOne(
     () => StatusesEntity,
     (statusesEntity) => statusesEntity.services,
     { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
@@ -93,10 +78,25 @@ export class ServicesEntity {
   @JoinColumn([{ name: "status_id", referencedColumnName: "id" }])
   status: StatusesEntity;
 
+  @ManyToOne(
+    () => CommunitiesEntity,
+    (communitiesEntity) => communitiesEntity.services,
+    { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
+  )
+  @JoinColumn([{ name: "community_id", referencedColumnName: "id" }])
+  community: CommunitiesEntity;
+
   @ManyToOne(() => UsersEntity, (usersEntity) => usersEntity.services, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
   user: UsersEntity;
+
+  @ManyToOne(() => TypesEntity, (typesEntity) => typesEntity.services, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "type_id", referencedColumnName: "id" }])
+  type: TypesEntity;
 }

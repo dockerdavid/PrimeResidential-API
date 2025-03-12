@@ -7,10 +7,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { UsersEntity } from "./users.entity";
 import { CompaniesEntity } from "./companies.entity";
 import { ServicesEntity } from "./services.entity";
 import { TypesEntity } from "./types.entity";
+import { UsersEntity } from "./users.entity";
 
 @Index("company_id", ["companyId"], {})
 @Index("user_id", ["userId"], {})
@@ -40,13 +40,6 @@ export class CommunitiesEntity {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => UsersEntity, (usersEntity) => usersEntity.communities, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: UsersEntity;
-
   @ManyToOne(
     () => CompaniesEntity,
     (companiesEntity) => companiesEntity.communities,
@@ -54,6 +47,13 @@ export class CommunitiesEntity {
   )
   @JoinColumn([{ name: "company_id", referencedColumnName: "id" }])
   company: CompaniesEntity;
+
+  @ManyToOne(() => UsersEntity, (usersEntity) => usersEntity.communities, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
+  user: UsersEntity;
 
   @OneToMany(() => ServicesEntity, (servicesEntity) => servicesEntity.community)
   services: ServicesEntity[];

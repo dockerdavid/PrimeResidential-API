@@ -1,17 +1,16 @@
 import {
   Column,
   Entity,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { PermissionsEntity } from "./permissions.entity";
 import { UsersEntity } from "./users.entity";
+import { PermissionsByRoleEntity } from "./permissions_by_role";
 
 @Entity("roles", { schema: "services_dbqa" })
 export class RolesEntity {
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
-  id: number;
+  id: string;
 
   @Column("varchar", { name: "name", length: 25 })
   name: string;
@@ -24,15 +23,12 @@ export class RolesEntity {
 
   @Column("timestamp", {
     name: "updated_at",
-    default: () => "CURRENT_TIMESTAMP",
+    default: () => "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
   })
   updatedAt: Date;
 
-  @ManyToMany(
-    () => PermissionsEntity,
-    (permissionsEntity) => permissionsEntity.roles
-  )
-  permissions: PermissionsEntity[];
+  @OneToMany(() => PermissionsByRoleEntity, (permissionsByRole) => permissionsByRole.role)
+  permissionsByRole: PermissionsByRoleEntity[];
 
   @OneToMany(() => UsersEntity, (usersEntity) => usersEntity.role)
   users: UsersEntity[];

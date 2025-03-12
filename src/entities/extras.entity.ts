@@ -12,7 +12,7 @@ export class ExtrasEntity {
   @Column("double", { name: "item_price", precision: 8, scale: 2 })
   itemPrice: number;
 
-  @Column("decimal", {
+  @Column("double", {
     name: "commission",
     precision: 8,
     scale: 2,

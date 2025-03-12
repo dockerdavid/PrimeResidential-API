@@ -2,13 +2,12 @@ import {
   Column,
   Entity,
   Index,
-  JoinTable,
-  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { RolesEntity } from "./roles.entity";
+import { PermissionsByRoleEntity } from "./permissions_by_role";
 
-@Index("name", ["name"], { unique: true })
+@Index("IDX_48ce552495d14eae9b187bb671", ["name"], { unique: true })
 @Entity("permissions", { schema: "services_dbqa" })
 export class PermissionsEntity {
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
@@ -25,16 +24,10 @@ export class PermissionsEntity {
 
   @Column("timestamp", {
     name: "updated_at",
-    default: () => "CURRENT_TIMESTAMP",
+    default: () => "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
   })
   updatedAt: Date;
 
-  @ManyToMany(() => RolesEntity, (rolesEntity) => rolesEntity.permissions)
-  @JoinTable({
-    name: "permissions_by_role",
-    joinColumns: [{ name: "permission_id", referencedColumnName: "id" }],
-    inverseJoinColumns: [{ name: "role_id", referencedColumnName: "id" }],
-    schema: "services_dbqa",
-  })
-  roles: RolesEntity[];
+  @OneToMany(() => PermissionsByRoleEntity, (permissionsByRole) => permissionsByRole.permission)
+  permissionsByRole: PermissionsByRoleEntity[];
 }
