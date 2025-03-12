@@ -115,19 +115,25 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.usersRepository.preload({
-      id,
-      ...updateUserDto,
-    });
-
+    const user = await this.usersRepository.findOne({ where: { id } });
+  
     if (!user) {
-      throw new NotFoundException(`Service with ID ${id} not found`);
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
-
+  
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+  
+    Object.assign(user, updateUserDto);
+  
     await this.usersRepository.save(user);
+
+    delete user.password;
 
     return user;
   }
+  
 
   async remove(id: string) {
     const user = await this.usersRepository.findOne({
