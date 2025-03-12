@@ -11,6 +11,9 @@ import { TypesModule } from './api/types/types.module';
 import { UsersModule } from './api/users/users.module';
 import { CostsModule } from './api/costs/costs.module';
 import { AuthModule } from './api/auth/auth.module';
+import { ReportsModule } from './api/reports/reports.module';
+import { PrinterModule } from './printer/printer.module';
+import { PermissionsModule } from './api/permissions/permissions.module';
 
 import envVars from './config/env';
 
@@ -35,6 +38,9 @@ import envVars from './config/env';
     StatusesModule,
     TypesModule,
     CalendarModule,
+    ReportsModule,
+    PrinterModule,
+    PermissionsModule,
   ],
   controllers: [],
   providers: [],
