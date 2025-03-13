@@ -17,8 +17,8 @@ export class ReportsController {
   }
 
   @Get('/costos-semana/:date')
-  costosSemana(@Res() response: Response, @Param('date', new ParseDatePipe()) date: string) {
-    const pdfDoc = this.reportsService.costosSemana(date);
+  async costosSemana(@Res() response: Response, @Param('date', new ParseDatePipe()) date: string) {
+    const pdfDoc = await this.reportsService.costosSemana(date);
     response.setHeader('Content-Type', 'application/pdf');
     pdfDoc.pipe(response);
     pdfDoc.end();
