@@ -73,7 +73,7 @@ export class ServicesController {
   findByCommunities(
     @Query() pageOptionsDto: PageOptionsDto,
     @Body() servicesByManagerDto: ServicesByManagerDto,
-    @Query('statusID', new ParseIntPipe({ optional: true })) statusID?: number,
+    @Query('statusID', new ParseIntPipe({ optional: true })) statusID: number,
   ): Promise<PageDto<ServicesEntity>> {
     return this.servicesService.findByCommunities(servicesByManagerDto, pageOptionsDto, statusID);
   }
