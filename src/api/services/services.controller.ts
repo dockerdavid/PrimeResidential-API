@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ParseIntPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -73,8 +73,9 @@ export class ServicesController {
   findByCommunities(
     @Query() pageOptionsDto: PageOptionsDto,
     @Body() servicesByManagerDto: ServicesByManagerDto,
+    @Query('statusID', ParseIntPipe) statusID?: number,
   ): Promise<PageDto<ServicesEntity>> {
-    return this.servicesService.findByCommunities(servicesByManagerDto, pageOptionsDto);
+    return this.servicesService.findByCommunities(servicesByManagerDto, pageOptionsDto, statusID);
   }
 
   @Post('/by-status/:statusID')
