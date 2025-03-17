@@ -27,6 +27,7 @@ export class CostsController {
   }
 
   @Post('/search')
+  @ApiPaginatedResponse(CostsEntity)
   @UseGuards(AuthGuard('jwt'))
   searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<CostsEntity>> {
     return this.costsService.searchByWord(searchDto, pageOptionsDto);

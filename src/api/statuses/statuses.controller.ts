@@ -27,6 +27,7 @@ export class StatusesController {
   }
 
   @Post('/search')
+  @ApiPaginatedResponse(StatusesEntity)
   @UseGuards(AuthGuard('jwt'))
   searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<StatusesEntity>> {
     return this.statusesService.searchByWord(searchDto, pageOptionsDto);

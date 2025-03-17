@@ -27,6 +27,7 @@ export class UsersController {
   }
 
   @Post('/search')
+  @ApiPaginatedResponse(UsersEntity)
   @UseGuards(AuthGuard('jwt'))
   searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<UsersEntity>> {
     return this.usersService.searchByWord(searchDto, pageOptionsDto);

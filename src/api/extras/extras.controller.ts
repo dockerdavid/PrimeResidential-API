@@ -27,6 +27,7 @@ export class ExtrasController {
   }
 
   @Post('/search')
+  @ApiPaginatedResponse(ExtrasEntity)
   @UseGuards(AuthGuard('jwt'))
   searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<ExtrasEntity>> {
     return this.extrasService.searchByWord(searchDto, pageOptionsDto);

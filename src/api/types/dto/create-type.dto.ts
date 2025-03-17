@@ -32,7 +32,7 @@ export class CreateTypeDto {
         default: '0.00',
     })
     @IsString()
-    commission: string;
+    commission: number;
 
     @ApiProperty({
         description:

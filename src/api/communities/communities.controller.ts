@@ -27,6 +27,7 @@ export class CommunitiesController {
   }
 
   @Post('/search')
+  @ApiPaginatedResponse(CommunitiesEntity)
   @UseGuards(AuthGuard('jwt'))
   searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<CommunitiesEntity>> {
     return this.communitiesService.searchByWord(searchDto, pageOptionsDto);

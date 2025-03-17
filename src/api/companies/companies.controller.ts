@@ -27,6 +27,7 @@ export class CompaniesController {
   }
 
   @Post('/search')
+  @ApiPaginatedResponse(CompaniesEntity)
   @UseGuards(AuthGuard('jwt'))
   searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<CompaniesEntity>> {
     return this.companiesService.searchByWord(searchDto, pageOptionsDto);

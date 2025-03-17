@@ -4,14 +4,14 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { UpdateServiceDto } from './dto/update-service.dto';
 
-import { ServicesService } from './services.service';
+import { ServicesDashboard, ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
-import { PageOptionsDto } from 'src/dto/page-options.dto';
-import { PageDto } from 'src/dto/page.dto';
-import { ServicesEntity } from 'src/entities/services.entity';
-import { ApiPaginatedResponse } from 'src/decorators/api-paginated-response.decorator';
 import { ServicesByManagerDto } from './dto/services-by-manager.dto';
-import { SearchDto } from 'src/dto/search.dto';
+import { PageOptionsDto } from '../../dto/page-options.dto';
+import { SearchDto } from '../../dto/search.dto';
+import { ServicesEntity } from '../../entities/services.entity';
+import { ApiPaginatedResponse } from '../../decorators/api-paginated-response.decorator';
+import { PageDto } from '../../dto/page.dto';
 
 @ApiBearerAuth()
 @ApiTags('services')
@@ -20,6 +20,7 @@ export class ServicesController {
   constructor(private readonly servicesService: ServicesService) { }
 
   @Post('/search')
+  @ApiPaginatedResponse(ServicesEntity)
   @UseGuards(AuthGuard('jwt'))
   searchByWord(@Query() pageOptionsDto: PageOptionsDto, @Body() searchDto: SearchDto): Promise<PageDto<ServicesEntity>> {
     return this.servicesService.searchByWord(searchDto, pageOptionsDto);
@@ -28,7 +29,7 @@ export class ServicesController {
   @Get('')
   @ApiPaginatedResponse(ServicesEntity)
   @UseGuards(AuthGuard('jwt'))
-  findAll(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
+  findAll(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesDashboard>> {
     return this.servicesService.findAll(pageOptionsDto);
   }
 
@@ -69,6 +70,7 @@ export class ServicesController {
   }
 
   @Post('/by-communities')
+  @ApiPaginatedResponse(ServicesEntity)
   @UseGuards(AuthGuard('jwt'))
   @ApiQuery({
     name: "statusID",
@@ -85,6 +87,7 @@ export class ServicesController {
   }
 
   @Post('/by-status/:statusID')
+  @ApiPaginatedResponse(ServicesEntity)
   @UseGuards(AuthGuard('jwt'))
   findByStatus(
     @Param('statusID') statusID: string,

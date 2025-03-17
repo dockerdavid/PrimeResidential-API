@@ -29,9 +29,9 @@ export class TypesEntity {
     name: "commission",
     precision: 8,
     scale: 2,
-    default: () => "'0.00'",
+    default: () => 0,
   })
-  commission: string;
+  commission: number;
 
   @Column("bigint", { name: "community_id", unsigned: true })
   communityId: string;

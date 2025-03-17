@@ -6,13 +6,19 @@ import { Repository } from 'typeorm';
 import { ServicesByManagerDto } from './dto/services-by-manager.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
-import { PageOptionsDto } from 'src/dto/page-options.dto';
-import { PageMetaDto } from 'src/dto/page-meta.dto';
-import { PageDto } from 'src/dto/page.dto';
 
-import { ExtrasByServiceEntity } from 'src/entities/extras_by_service.entity';
-import { ServicesEntity } from 'src/entities/services.entity';
-import { SearchDto } from 'src/dto/search.dto';
+import { ServicesEntity } from '../../entities/services.entity';
+import { ExtrasByServiceEntity } from '../../entities/extras_by_service.entity';
+import { SearchDto } from '../../dto/search.dto';
+import { PageOptionsDto } from '../../dto/page-options.dto';
+import { PageDto } from '../../dto/page.dto';
+import { PageMetaDto } from '../../dto/page-meta.dto';
+
+export interface ServicesDashboard extends ServicesEntity {
+  totalCleaner: number;
+  totalParner: any;
+  total: any;
+}
 
 @Injectable()
 export class ServicesService {
@@ -49,7 +55,7 @@ export class ServicesService {
     return new PageDto(items, pageMetaDto);
   }
 
-  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
+  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesDashboard>> {
     const queryBuilder = this.servicesRepository.createQueryBuilder('services')
 
     queryBuilder
@@ -67,7 +73,26 @@ export class ServicesService {
 
     const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
 
-    return new PageDto(items, pageMetaDto);
+    const servicesDashboard = items.map(service => {
+      const totalExtrasByService = service.extrasByServices.reduce((acc, extraByService) => {
+        return acc + Number(extraByService.extra.commission);
+      }, 0);
+      
+      const totalCleaner = Number(totalExtrasByService) + Number(service.type.commission);
+      const totalNotAdjusted = Number(service.type.price) - Number(service.type.commission) - Number(totalExtrasByService);
+      
+      const totalParner = totalNotAdjusted * 0.4;
+      const total = totalNotAdjusted * 0.6;
+
+      return {
+        ...service,
+        totalCleaner,
+        totalParner,
+        total,
+      };
+    });
+
+    return new PageDto(servicesDashboard, pageMetaDto);
   }
 
   async findAllByStatusID(statusID: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
