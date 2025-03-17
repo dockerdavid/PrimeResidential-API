@@ -9,24 +9,16 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) { }
 
   @Get('/reporte-general/:date')
-  reporteGeneral(@Res() response: Response, @Param('date', new ParseDatePipe()) date: string) {
-    const pdfDoc = this.reportsService.reporteSemana(date);
+  async reporteGeneral(@Res() response: Response, @Param('date', new ParseDatePipe()) date: string) {
+    const pdfDoc = await this.reportsService.reporteGeneral(date);
     response.setHeader('Content-Type', 'application/pdf');
     pdfDoc.pipe(response);
     pdfDoc.end();
   }
 
   @Get('/reporte-cleaner/:date')
-  reporteCleaner(@Res() response: Response, @Param('date', new ParseDatePipe()) date: string) {
-    const pdfDoc = this.reportsService.reporteSemana(date);
-    response.setHeader('Content-Type', 'application/pdf');
-    pdfDoc.pipe(response);
-    pdfDoc.end();
-  }
-
-  @Get('/reporte-invoce/:date')
-  reporteInvoice(@Res() response: Response, @Param('date', new ParseDatePipe()) date: string) {
-    const pdfDoc = this.reportsService.reporteSemana(date);
+  async reporteCleaner(@Res() response: Response, @Param('date', new ParseDatePipe()) date: string) {
+    const pdfDoc = await this.reportsService.reporteCleaner(date);
     response.setHeader('Content-Type', 'application/pdf');
     pdfDoc.pipe(response);
     pdfDoc.end();
