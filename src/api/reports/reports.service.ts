@@ -55,7 +55,7 @@ export class ReportsService {
 
     const today = moment();
 
-    const queryBuilder = this.servicesRepository.createQueryBuilder('services')
+    const queryBuilder = this.servicesRepository.createQueryBuilder('services');
 
     queryBuilder
       .leftJoinAndSelect('services.community', 'community')
@@ -64,9 +64,9 @@ export class ReportsService {
       .leftJoinAndSelect('services.user', 'user')
       .leftJoinAndSelect('services.extrasByServices', 'extrasByServices')
       .leftJoinAndSelect('extrasByServices.extra', 'extra')
-      .where('services.date BETWEEN :startOfWeek AND :endOfWeek', { startOfWeek, endOfWeek })
+      .where('services.date BETWEEN :startOfWeek AND :endOfWeek', { startOfWeek, endOfWeek });
 
-    const services = await queryBuilder.getMany()
+    const services = await queryBuilder.getMany();
 
     const servicesDashboard = services.map(service => {
       const totalExtrasByService = service.extrasByServices.reduce((acc, extraByService) => {
@@ -89,6 +89,7 @@ export class ReportsService {
 
     const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 
+    // Totales
     const totalServicePrice = servicesDashboard.reduce((acc, service) => acc + Number(service.type.price), 0);
     const totalServiceCommission = servicesDashboard.reduce((acc, service) => acc + Number(service.type.commission), 0);
     const totalExtrasPrice = servicesDashboard.reduce((acc, service) =>
@@ -128,6 +129,42 @@ export class ReportsService {
         '']
     ];
 
+    // ---------- Sección de la tabla de Costos ----------
+    const costs = [];
+
+    const costsVariables = await this.costsRepository.find({
+      where: {
+        date: Between(startOfWeek, endOfWeek),
+      },
+    });
+
+    const extraCosts = [
+      { date: today.format('MM/DD/YYYY'), description: 'GoDaddy (email QPS)', amount: 2.5 },
+      { date: today.format('MM/DD/YYYY'), description: 'Savings Navidad', amount: 75 },
+      { date: today.format('MM/DD/YYYY'), description: 'Kemper (Insurance)', amount: 105.75 },
+      { date: today.format('MM/DD/YYYY'), description: 'Next Insurance G/L', amount: 20 },
+    ];
+
+    costs.push(
+      ...extraCosts.map(cost => ({
+        date: moment(cost.date).format('YYYY-MM-DD'),
+        description: cost.description,
+        amount: cost.amount,
+      })),
+      ...costsVariables,
+    );
+
+    const costosTableBody = [
+      ['Date', 'Description', 'Amount'],
+      ...costs.map(cost => [
+        moment(cost.date).format('MM/DD/YYYY'),
+        cost.description,
+        `$${Number(cost.amount).toFixed(2)}`,
+      ]),
+      ['', 'Total', `$${costs.reduce((sum, cost) => sum + Number(cost.amount), 0).toFixed(2)}`]
+    ];
+
+    // Integrar ambos reportes en un solo PDF
     const docDefinition: TDocumentDefinitions = {
       styles,
       pageMargins: [40, 120, 40, 60],
@@ -151,11 +188,29 @@ export class ReportsService {
       },
       content: [
         {
+          text: 'Service Report',
+          style: 'subheader',
+          margin: [0, 10, 0, 10],
+        },
+        {
           layout: 'customLayout01',
           table: {
             headerRows: 1,
             widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: tableBody
+          }
+        },
+        {
+          text: 'Weekly Costs',
+          style: 'subheader',
+          margin: [0, 20, 0, 10],
+        },
+        {
+          layout: 'customLayout01',
+          table: {
+            headerRows: 1,
+            widths: ['auto', '*', 'auto'],
+            body: costosTableBody
           }
         }
       ],
@@ -167,10 +222,12 @@ export class ReportsService {
 
     const doc = this.printerService.createPDF(docDefinition);
 
-    doc.info.Title = `Costos semana ${startOfWeek} al ${endOfWeek}`;
+    doc.info.Title = `General Report ${startOfWeek} - ${endOfWeek}`;
 
     return doc;
   }
+
+
 
   async reporteCleaner(date: string) {
     const startOfWeek = moment(date).startOf('isoWeek').format('YYYY-MM-DD');
@@ -290,7 +347,6 @@ export class ReportsService {
     doc.info.Title = `Costos semana ${startOfWeek} al ${endOfWeek}`;
     return doc;
   }
-
 
   async costosSemana(date: string) {
     const startOfWeek = moment(date).startOf('isoWeek').format('YYYY-MM-DD');
