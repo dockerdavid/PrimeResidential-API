@@ -181,7 +181,6 @@ export class ServicesService {
   async findByCommunities(
     servicesByManagerDto: ServicesByManagerDto,
     pageOptionsDto: PageOptionsDto,
-    statusID?: number
   ): Promise<PageDto<ServicesEntity>> {
     const queryBuilder = this.servicesRepository.createQueryBuilder('services')
       .leftJoinAndSelect('services.community', 'community')
@@ -195,8 +194,8 @@ export class ServicesService {
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take);
 
-    if (statusID !== undefined) {
-      queryBuilder.andWhere('services.statusId = :statusID', { statusID });
+    if (servicesByManagerDto.statusID !== undefined) {
+      queryBuilder.andWhere('services.statusId = :statusID', { statusID: servicesByManagerDto.statusID });
     }
 
     const [items, totalCount] = await queryBuilder.getManyAndCount();

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsArray, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class ServicesByManagerDto {
     @ApiProperty({
@@ -11,4 +11,11 @@ export class ServicesByManagerDto {
     @IsString({ each: true })
     communities: string[];
 
+    @ApiProperty({
+        description: 'Status ID',
+        example: '1',
+    })
+    @IsString()
+    @IsOptional()
+    statusID?: string;
 }

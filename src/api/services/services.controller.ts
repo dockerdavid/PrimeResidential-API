@@ -72,18 +72,11 @@ export class ServicesController {
   @Post('/by-communities')
   @ApiPaginatedResponse(ServicesEntity)
   @UseGuards(AuthGuard('jwt'))
-  @ApiQuery({
-    name: "statusID",
-    type: Number,
-    description: "Status ID",
-    required: false
-  })
   findByCommunities(
     @Query() pageOptionsDto: PageOptionsDto,
     @Body() servicesByManagerDto: ServicesByManagerDto,
-    @Query('statusID', new ParseIntPipe({ optional: true })) statusID?: number,
   ): Promise<PageDto<ServicesEntity>> {
-    return this.servicesService.findByCommunities(servicesByManagerDto, pageOptionsDto, statusID);
+    return this.servicesService.findByCommunities(servicesByManagerDto, pageOptionsDto);
   }
 
   @Post('/by-status/:statusID')
