@@ -31,10 +31,7 @@ import { TwilioModule } from 'nestjs-twilio';
       synchronize: true,
       autoLoadEntities: true,
     }),
-    TwilioModule.forRoot({
-      accountSid: envVars.TWILIO_SID,
-      authToken: envVars.TWILIO_TOKEN,
-    }),
+
     AuthModule,
     ServicesModule,
     UsersModule,
