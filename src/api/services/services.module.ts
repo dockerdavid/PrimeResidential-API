@@ -8,11 +8,10 @@ import { ExtrasByServiceEntity } from '../../entities/extras_by_service.entity';
 import { UsersEntity } from '../../entities/users.entity';
 import { PushNotificationsService } from '../../push-notification/push-notification.service';
 import { NotificationsModule } from '../../push-notification/push-notification.module';
-import { TwilioModule } from 'nestjs-twilio';
 
 @Module({
   controllers: [ServicesController],
   providers: [ServicesService, PushNotificationsService],
-  imports: [TypeOrmModule.forFeature([ServicesEntity, ExtrasByServiceEntity, UsersEntity]), NotificationsModule, TwilioModule],
+  imports: [TypeOrmModule.forFeature([ServicesEntity, ExtrasByServiceEntity, UsersEntity]), NotificationsModule],
 })
 export class ServicesModule { }
