@@ -22,7 +22,6 @@ export class UsersService {
     private readonly rolesRepository: Repository<RolesEntity>,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
-    private readonly pushNotificationService: PushNotificationsService,
   ) { }
 
   async create(createUserDto: CreateUserDto) {
