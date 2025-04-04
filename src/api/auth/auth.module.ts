@@ -7,10 +7,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import envVars from '../../config/env';
+import { UsersEntity } from '../../entities/users.entity';
+import { PushNotificationsService } from '../../push-notification/push-notification.service';
 
-import { UsersEntity } from 'src/entities/users.entity';
-
-import envVars from 'src/config/env';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import envVars from 'src/config/env';
     TypeOrmModule.forFeature([UsersEntity])
   ],
   controllers: [AuthController],
-  providers: [JwtStrategy, AuthService],
+  providers: [JwtStrategy, AuthService, PushNotificationsService],
   exports: [JwtStrategy, PassportModule, JwtModule],
 })
 

@@ -6,6 +6,7 @@ import * as bcrypt from 'bcryptjs';
 
 import { UserDto } from './dto/user.dto';
 import { UsersEntity } from '../../entities/users.entity';
+import { PushNotificationsService } from '../../push-notification/push-notification.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
   constructor(
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
+    private readonly pushNotificationService: PushNotificationsService,
   ) { }
 
   async login(userDto: UserDto) {
@@ -31,6 +33,13 @@ export class AuthService {
     delete user.password;
 
     await this.usersRepository.update(user.id, { token });
+
+    this.pushNotificationService.sendNotification([token], {
+      body: 'Welcome to our app',
+      title: 'Login successful',
+      data: { userId: user.id },
+      sound: 'default',
+    })
 
     return {
       status: HttpStatus.OK,
