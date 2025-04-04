@@ -16,6 +16,7 @@ import { PrinterModule } from './printer/printer.module';
 import { PermissionsModule } from './api/permissions/permissions.module';
 
 import envVars from './config/env';
+import { TwilioModule } from 'nestjs-twilio';
 
 @Module({
   imports: [
@@ -29,6 +30,10 @@ import envVars from './config/env';
       entities: [__dirname + '/entities/*.entity{.ts,.js}'],
       synchronize: true,
       autoLoadEntities: true,
+    }),
+    TwilioModule.forRoot({
+      accountSid: envVars.TWILIO_SID,
+      authToken: envVars.TWILIO_TOKEN,
     }),
     AuthModule,
     ServicesModule,

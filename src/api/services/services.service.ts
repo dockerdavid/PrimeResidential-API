@@ -265,7 +265,7 @@ export class ServicesService {
           },
         };
 
-        this.pushNotificationService.sendNotification([user.token], notification)
+        this.pushNotificationService.sendNotification([user], notification)
       }
     }
 
@@ -304,7 +304,7 @@ export class ServicesService {
           },
         };
 
-        this.pushNotificationService.sendNotification([user.token], notification)
+        this.pushNotificationService.sendNotification([user], notification)
       }
     }
 
@@ -332,7 +332,7 @@ export class ServicesService {
         },
       };
 
-      this.pushNotificationService.sendNotification([service.user.token], notification)
+      this.pushNotificationService.sendNotification([service.user], notification)
     }
 
     return this.servicesRepository.remove(service);

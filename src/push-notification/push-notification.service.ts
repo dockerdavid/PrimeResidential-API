@@ -5,6 +5,8 @@ import {
 
 import { Expo, ExpoPushMessage } from 'expo-server-sdk';
 import envVars from '../config/env';
+import { UsersEntity } from '../entities/users.entity';
+import { TwilioService } from 'nestjs-twilio';
 
 
 export interface PushNotification {
@@ -16,12 +18,18 @@ export interface PushNotification {
 
 @Injectable()
 export class PushNotificationsService {
+
+    constructor(
+        private readonly twilioService: TwilioService,
+    ) { }
+
     private expo = new Expo({
         accessToken: envVars.EXPO_ACCESS_TOKEN,
         useFcmV1: true,
     });
 
-    sendNotification(toTokens: string[], notification: PushNotification) {
+    sendNotification(users: UsersEntity[], notification: PushNotification) {
+        const toTokens = users.map((user) => user.token);
         const areExpoTokens = toTokens.every(Expo.isExpoPushToken);
 
         if (!areExpoTokens) {
@@ -47,6 +55,16 @@ export class PushNotificationsService {
                 console.log(error);
             }
         }
+
+        users.forEach((user) => {
+            this.twilioService.client.messages.create({
+                body: notification.body,
+                from: envVars.TWILIO_SENDER_NUMBER,
+                to: user.phoneNumber,
+            })
+            .then((message: any) => console.log('SMS sent successfully:', message.sid))
+            .catch((error: any) => console.error('Error sending SMS:', error));
+        });
 
         return {
             done: true,
