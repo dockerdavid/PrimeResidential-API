@@ -14,7 +14,6 @@ import { AuthModule } from './api/auth/auth.module';
 import { ReportsModule } from './api/reports/reports.module';
 import { PrinterModule } from './printer/printer.module';
 import { PermissionsModule } from './api/permissions/permissions.module';
-import { PushNotificationService } from './push-notification/push-notification.service';
 
 import envVars from './config/env';
 
@@ -46,7 +45,7 @@ import envVars from './config/env';
     PermissionsModule,
   ],
   controllers: [],
-  providers: [PushNotificationService],
+  providers: [],
 })
 
 export class AppModule { }
