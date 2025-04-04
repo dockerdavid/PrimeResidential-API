@@ -13,6 +13,8 @@ import { SearchDto } from '../../dto/search.dto';
 import { PageOptionsDto } from '../../dto/page-options.dto';
 import { PageDto } from '../../dto/page.dto';
 import { PageMetaDto } from '../../dto/page-meta.dto';
+import { PushNotificationsService } from '../../push-notification/push-notification.service';
+import { UsersEntity } from '../../entities/users.entity';
 
 export interface ServicesDashboard extends ServicesEntity {
   totalCleaner: number;
@@ -28,6 +30,9 @@ export class ServicesService {
     private readonly servicesRepository: Repository<ServicesEntity>,
     @InjectRepository(ExtrasByServiceEntity)
     private readonly extrasByServiceRepository: Repository<ExtrasByServiceEntity>,
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
+    private readonly pushNotificationService: PushNotificationsService,
   ) { }
 
   async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
@@ -77,10 +82,10 @@ export class ServicesService {
       const totalExtrasByService = service.extrasByServices.reduce((acc, extraByService) => {
         return acc + Number(extraByService.extra.commission);
       }, 0);
-      
+
       const totalCleaner = Number(totalExtrasByService) + Number(service.type.commission);
       const totalNotAdjusted = Number(service.type.price) - Number(service.type.commission) - Number(totalExtrasByService);
-      
+
       const totalParner = totalNotAdjusted * 0.4;
       const total = totalNotAdjusted * 0.6;
 
@@ -243,6 +248,25 @@ export class ServicesService {
       await this.extrasByServiceRepository.save(extras);
     }
 
+    if (createServiceDto.userId) {
+      const user = await this.usersRepository.findOne({
+        where: { id: createServiceDto.userId },
+      });
+
+      const notification = {
+        body: `A new service has been created with ID: ${service.id}`,
+        title: 'New Service Created',
+        data: {
+          serviceId: service.id,
+          serviceType: service.type,
+          serviceDate: service.date,
+          serviceStatus: service.status,
+        },
+      };
+
+      this.pushNotificationService.sendNotification([user.token], notification)
+    }
+
     return {
       service,
       extras,
@@ -261,6 +285,25 @@ export class ServicesService {
 
     await this.servicesRepository.save(service);
 
+    if (updateServiceDto.userId) {
+      const user = await this.usersRepository.findOne({
+        where: { id: updateServiceDto.userId },
+      });
+
+      const notification = {
+        body: `The service with ID: ${service.id} has been updated`,
+        title: 'Service Updated',
+        data: {
+          serviceId: service.id,
+          serviceType: service.type,
+          serviceDate: service.date,
+          serviceStatus: service.status,
+        },
+      };
+
+      this.pushNotificationService.sendNotification([user.token], notification)
+    }
+
     return service;
   }
 
@@ -271,6 +314,21 @@ export class ServicesService {
 
     if (!service) {
       throw new NotFoundException(`Service with ID ${id} not found`);
+    }
+
+    if (service.user.token && service.user.token.length > 0) {
+      const notification = {
+        body: `The service with ID: ${service.id} has been removed`,
+        title: 'Service Removed',
+        data: {
+          serviceId: service.id,
+          serviceType: service.type,
+          serviceDate: service.date,
+          serviceStatus: service.status,
+        },
+      };
+     
+      this.pushNotificationService.sendNotification([service.user.token], notification)
     }
 
     return this.servicesRepository.remove(service);

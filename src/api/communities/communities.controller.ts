@@ -2,17 +2,17 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } f
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
-import { ApiPaginatedResponse } from 'src/decorators/api-paginated-response.decorator';
 
 import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
-import { PageOptionsDto } from 'src/dto/page-options.dto';
-import { PageDto } from 'src/dto/page.dto';
 
 import { CommunitiesService } from './communities.service';
+import { PageOptionsDto } from '../../dto/page-options.dto';
+import { CommunitiesEntity } from '../../entities/communities.entity';
+import { SearchDto } from '../../dto/search.dto';
+import { PageDto } from '../../dto/page.dto';
+import { ApiPaginatedResponse } from '../../decorators/api-paginated-response.decorator';
 
-import { CommunitiesEntity } from 'src/entities/communities.entity';
-import { SearchDto } from 'src/dto/search.dto';
 
 @ApiBearerAuth()
 @ApiTags('communities')

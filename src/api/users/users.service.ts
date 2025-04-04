@@ -4,15 +4,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 
-import { PageOptionsDto } from 'src/dto/page-options.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PageMetaDto } from 'src/dto/page-meta.dto';
-import { PageDto } from 'src/dto/page.dto';
-
-import { RolesEntity } from 'src/entities/roles.entity';
-import { UsersEntity } from 'src/entities/users.entity';
-import { SearchDto } from 'src/dto/search.dto';
+import { RolesEntity } from '../../entities/roles.entity';
+import { UsersEntity } from '../../entities/users.entity';
+import { SearchDto } from '../../dto/search.dto';
+import { PageOptionsDto } from '../../dto/page-options.dto';
+import { PageDto } from '../../dto/page.dto';
+import { PageMetaDto } from '../../dto/page-meta.dto';
+import { PushNotificationsService } from '../../push-notification/push-notification.service';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +21,8 @@ export class UsersService {
     @InjectRepository(RolesEntity)
     private readonly rolesRepository: Repository<RolesEntity>,
     @InjectRepository(UsersEntity)
-    private readonly usersRepository: Repository<UsersEntity>
+    private readonly usersRepository: Repository<UsersEntity>,
+    private readonly pushNotificationService: PushNotificationsService,
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -133,7 +134,6 @@ export class UsersService {
 
     return user;
   }
-  
 
   async remove(id: string) {
     const user = await this.usersRepository.findOne({

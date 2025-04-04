@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common';
 
 import { CommunitiesController } from './communities.controller';
 import { CommunitiesService } from './communities.service';
+import { CommunitiesEntity } from '../../entities/communities.entity';
 
-import { CommunitiesEntity } from 'src/entities/communities.entity';
 
 @Module({
   controllers: [CommunitiesController],
