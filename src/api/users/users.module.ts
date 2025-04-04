@@ -6,12 +6,9 @@ import { UsersService } from './users.service';
 import { RolesEntity } from '../../entities/roles.entity';
 import { UsersEntity } from '../../entities/users.entity';
 
-import { PushNotificationsService } from '../../push-notification/push-notification.service';
-import { NotificationsModule } from '../../push-notification/push-notification.module';
-
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, NotificationsModule],
+  providers: [UsersService],
   imports: [TypeOrmModule.forFeature([RolesEntity, UsersEntity])]
 })
 
