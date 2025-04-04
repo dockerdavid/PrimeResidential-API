@@ -12,7 +12,6 @@ import { SearchDto } from '../../dto/search.dto';
 import { PageOptionsDto } from '../../dto/page-options.dto';
 import { PageDto } from '../../dto/page.dto';
 import { PageMetaDto } from '../../dto/page-meta.dto';
-import { PushNotificationsService } from '../../push-notification/push-notification.service';
 
 @Injectable()
 export class UsersService {
