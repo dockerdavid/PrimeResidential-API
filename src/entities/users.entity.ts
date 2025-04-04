@@ -32,6 +32,9 @@ export class UsersEntity {
   @Column("varchar", { name: "password", length: 255 })
   password: string;
 
+  @Column("varchar", { name: "token", length: 255 })
+  token: string;
+
   @Column("timestamp", {
     name: "created_at",
     default: () => "CURRENT_TIMESTAMP",

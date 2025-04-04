@@ -19,4 +19,11 @@ export class UserDto {
     @IsString()
     @MinLength(4)
     password: string;
+
+    @ApiProperty({
+        description: 'The token to firebase',
+        example: 'token'
+    })
+    @IsString()
+    token: string;
 }
