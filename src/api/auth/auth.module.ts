@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import envVars from '../../config/env';
 import { UsersEntity } from '../../entities/users.entity';
 import { PushNotificationsService } from '../../push-notification/push-notification.service';
+import { NotificationsModule } from '../../push-notification/push-notification.module';
 
 
 @Module({
@@ -21,7 +22,8 @@ import { PushNotificationsService } from '../../push-notification/push-notificat
       secret: envVars.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
-    TypeOrmModule.forFeature([UsersEntity])
+    TypeOrmModule.forFeature([UsersEntity]),
+    NotificationsModule,
   ],
   controllers: [AuthController],
   providers: [JwtStrategy, AuthService, PushNotificationsService],
