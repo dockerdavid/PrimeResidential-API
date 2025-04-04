@@ -5,7 +5,7 @@ import { PushNotificationsService } from './push-notification.service';
 @Module({
   imports: [TwilioModule],
   providers: [PushNotificationsService],
-  exports: [PushNotificationsService],
+  exports: [PushNotificationsService, TwilioModule],
 })
 
-export class NotificationsModule {}
+export class NotificationsModule { }
