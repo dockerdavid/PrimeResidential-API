@@ -32,14 +32,16 @@ export class AuthService {
 
     delete user.password;
 
-    await this.usersRepository.update(user.id, { token });
+    if (token) {
+      await this.usersRepository.update(user.id, { token });
 
-    this.pushNotificationService.sendNotification([token], {
-      body: 'Welcome to our app',
-      title: 'Login successful',
-      data: { userId: user.id },
-      sound: 'default',
-    })
+      this.pushNotificationService.sendNotification([token], {
+        body: 'Welcome to our app',
+        title: 'Login successful',
+        data: { userId: user.id },
+        sound: 'default',
+      })
+    }
 
     return {
       status: HttpStatus.OK,
