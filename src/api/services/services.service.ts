@@ -253,18 +253,20 @@ export class ServicesService {
         where: { id: createServiceDto.userId },
       });
 
-      const notification = {
-        body: `A new service has been created with ID: ${service.id}`,
-        title: 'New Service Created',
-        data: {
-          serviceId: service.id,
-          serviceType: service.type,
-          serviceDate: service.date,
-          serviceStatus: service.status,
-        },
-      };
+      if (user.token && user.token.length > 0) {
+        const notification = {
+          body: `A new service has been created with ID: ${service.id}`,
+          title: 'New Service Created',
+          data: {
+            serviceId: service.id,
+            serviceType: service.type,
+            serviceDate: service.date,
+            serviceStatus: service.status,
+          },
+        };
 
-      this.pushNotificationService.sendNotification([user.token], notification)
+        this.pushNotificationService.sendNotification([user.token], notification)
+      }
     }
 
     return {
@@ -290,18 +292,20 @@ export class ServicesService {
         where: { id: updateServiceDto.userId },
       });
 
-      const notification = {
-        body: `The service with ID: ${service.id} has been updated`,
-        title: 'Service Updated',
-        data: {
-          serviceId: service.id,
-          serviceType: service.type,
-          serviceDate: service.date,
-          serviceStatus: service.status,
-        },
-      };
+      if (user.token && user.token.length > 0) {
+        const notification = {
+          body: `The service with ID: ${service.id} has been updated`,
+          title: 'Service Updated',
+          data: {
+            serviceId: service.id,
+            serviceType: service.type,
+            serviceDate: service.date,
+            serviceStatus: service.status,
+          },
+        };
 
-      this.pushNotificationService.sendNotification([user.token], notification)
+        this.pushNotificationService.sendNotification([user.token], notification)
+      }
     }
 
     return service;
@@ -327,7 +331,7 @@ export class ServicesService {
           serviceStatus: service.status,
         },
       };
-     
+
       this.pushNotificationService.sendNotification([service.user.token], notification)
     }
 
