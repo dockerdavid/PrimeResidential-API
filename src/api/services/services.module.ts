@@ -11,7 +11,11 @@ import { NotificationsModule } from '../../push-notification/push-notification.m
 
 @Module({
   controllers: [ServicesController],
-  providers: [ServicesService, PushNotificationsService],
-  imports: [TypeOrmModule.forFeature([ServicesEntity, ExtrasByServiceEntity, UsersEntity]), NotificationsModule],
+  providers: [ServicesService],
+  imports: [
+    TypeOrmModule.forFeature([ServicesEntity, ExtrasByServiceEntity, UsersEntity]),
+    NotificationsModule,
+  ],
+
 })
 export class ServicesModule { }
