@@ -12,7 +12,6 @@ interface EnvVars {
     TWILIO_SID: string
     TWILIO_TOKEN: string
     TWILIO_SENDER_NUMBER: string
-    ADMIN_PHONE_NUMBER: string
     JWT_SECRET: string
     PORT: number
     EXPO_ACCESS_TOKEN: string
@@ -29,7 +28,6 @@ const envSchema = joi
     TWILIO_SID: joi.string().required(),
     TWILIO_TOKEN: joi.string().required(),
     TWILIO_SENDER_NUMBER: joi.string().required(),
-    ADMIN_PHONE_NUMBER: joi.string().required(),
     JWT_SECRET: joi.string().required(),
     PORT: joi.number().default(3000),
     EXPO_ACCESS_TOKEN: joi.string().required(),
