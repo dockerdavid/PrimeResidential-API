@@ -29,11 +29,8 @@ export class PushNotificationsService {
     });
 
     sendNotification(users: UsersEntity[], notification: PushNotification) {
-        console.log(users)
         const toTokens = users.map((user) => user.token);
         const areExpoTokens = toTokens.every(Expo.isExpoPushToken);
-
-        console.log('Expo tokens:', toTokens);
 
         if (!areExpoTokens) {
             return
@@ -55,19 +52,17 @@ export class PushNotificationsService {
                 const ticketChunk = this.expo.sendPushNotificationsAsync(chunk);
                 tickets.push(ticketChunk);
             } catch (error) {
-                console.log(error);
             }
         }
 
         users.forEach((user) => {
-            console.log('Sending SMS to user:', user.phoneNumber);
             this.twilioService.client.messages.create({
                 body: notification.body,
                 from: envVars.TWILIO_SENDER_NUMBER,
                 to: user.phoneNumber,
             })
-            .then((message: any) => console.log('SMS sent successfully:', message.sid))
-            .catch((error: any) => console.error('Error sending SMS:', error));
+            .then((_: any) => {})
+            .catch((_: any) => {});
         });
 
         return {
