@@ -29,6 +29,8 @@ export class PushNotificationsService {
     });
 
     sendNotification(users: UsersEntity[], notification: PushNotification) {
+        console.log('users', users);
+        console.log('notification', notification);
         const toTokens = users.map((user) => user.token);
         const areExpoTokens = toTokens.every(Expo.isExpoPushToken);
 
