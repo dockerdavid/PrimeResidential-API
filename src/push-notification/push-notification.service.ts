@@ -1,19 +1,24 @@
 import {
-    BadRequestException,
     Injectable,
 } from '@nestjs/common';
 
 import { Expo, ExpoPushMessage } from 'expo-server-sdk';
-import envVars from '../config/env';
-import { UsersEntity } from '../entities/users.entity';
 import { TwilioService } from 'nestjs-twilio';
 
+import { UsersEntity } from '../entities/users.entity';
+import envVars from '../config/env';
+
+export interface TokensNotification {
+    tokens: string[];
+    users: UsersEntity[];
+}
 
 export interface PushNotification {
     body: string;
     title: string;
     data?: Record<string, any>;
     sound?: string;
+    tokensNotification: TokensNotification;
 }
 
 @Injectable()
@@ -28,21 +33,20 @@ export class PushNotificationsService {
         useFcmV1: true,
     });
 
-    sendNotification(toTokens: string[], notification: PushNotification) {
-        // const toTokens = users.map((user) => user.token);
-        // const areExpoTokens = toTokens.every(Expo.isExpoPushToken);
+    sendNotification(pushNotification: PushNotification) {
+        const areExpoTokens = pushNotification.tokensNotification.tokens.every(Expo.isExpoPushToken);
 
-        // if (!areExpoTokens) {
-        //     return
-        // }
+        if (!areExpoTokens) {
+            return
+        }
 
-        // const messages: ExpoPushMessage[] = toTokens.map((token) => ({
-        //     to: token,
-        //     sound: notification.sound || 'default',
-        //     body: notification.body,
-        //     title: notification.title,
-        //     data: notification.data,
-        // }));
+        const messages: ExpoPushMessage[] = pushNotification.tokensNotification.tokens.map((token) => ({
+            to: token,
+            sound: pushNotification.sound || 'default',
+            body: pushNotification.body,
+            title: pushNotification.title,
+            data: pushNotification.data,
+        }));
 
         const chunks = this.expo.chunkPushNotifications(messages);
         const tickets = [];
@@ -56,9 +60,9 @@ export class PushNotificationsService {
             }
         }
 
-        users.forEach((user) => {
+        pushNotification.tokensNotification.users.forEach((user) => {
             this.twilioService.client.messages.create({
-                body: notification.body,
+                body: pushNotification.body,
                 from: envVars.TWILIO_SENDER_NUMBER,
                 to: user.phoneNumber,
             })

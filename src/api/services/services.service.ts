@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { ServicesByManagerDto } from './dto/services-by-manager.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -327,29 +327,42 @@ export class ServicesService {
     service: ServicesEntity,
     notification: { body: string; title: string; data: any }
   ) {
-    const cleanerToken = service.user.token;
-    const superAdminTokens = await this.usersRepository.find({
+    const superAdmins = await this.usersRepository.find({
       where: { roleId: '1' },
-      select: ['token'],
+      select: ['id', 'token'],
     });
 
-    const communitiesToken = await this.communitiesRepository.find({
+    const communities = await this.communitiesRepository.find({
       where: { id: service.communityId },
-      relations: ['users'],
+      relations: ['user'],
     });
 
-    const communityUsers = communitiesToken.flatMap(community => community.user);
-    const communityTokens = communityUsers.map(user => user.token);
+    const communityUsers = communities
+      .map(c => c.user)
+      .filter(Boolean);
 
-    const allTokens = [cleanerToken, ...superAdminTokens.map(user => user.token), ...communityTokens];
-    const uniqueTokens = Array.from(new Set(allTokens));
+    const allUsers = [
+      ...(service.user ? [service.user] : []),
+      ...superAdmins,
+      ...communityUsers,
+    ].filter(
+      (user, index, self) =>
+        user?.token && self.findIndex(u => u.token === user.token) === index
+    );
 
-    const notificationData = {
+    const uniqueTokens = allUsers.map(u => u.token);
+
+    if (uniqueTokens.length === 0) return;
+
+    return this.pushNotificationService.sendNotification({
       body: notification.body,
       title: notification.title,
       data: notification.data,
-    };
-
-    return this.pushNotificationService.sendNotification(uniqueTokens, notificationData)
+      sound: 'default',
+      tokensNotification: {
+        tokens: uniqueTokens,
+        users: allUsers,
+      },
+    });
   }
 }

@@ -36,11 +36,15 @@ export class AuthService {
     if (token) {
       await this.usersRepository.update(user.id, { token });
 
-      this.pushNotificationService.sendNotification([user], {
+      this.pushNotificationService.sendNotification({
         body: 'Welcome to our app',
         title: 'Login successful',
         data: { userId: user.id },
         sound: 'default',
+        tokensNotification: {
+          tokens: [token],
+          users: [user],
+        },
       })
     }
 
