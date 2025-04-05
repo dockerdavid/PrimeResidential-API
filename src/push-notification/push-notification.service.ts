@@ -57,6 +57,7 @@ export class PushNotificationsService {
         }
 
         users.forEach((user) => {
+            console.log('Sending SMS to user:', user.phoneNumber);
             this.twilioService.client.messages.create({
                 body: notification.body,
                 from: envVars.TWILIO_SENDER_NUMBER,
