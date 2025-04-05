@@ -14,6 +14,7 @@ import { NotificationsModule } from '../../push-notification/push-notification.m
 
 
 @Module({
+  providers: [JwtStrategy, AuthService],
   imports: [
     PassportModule.register({
       defaultStrategy: 'jwt',
@@ -26,7 +27,6 @@ import { NotificationsModule } from '../../push-notification/push-notification.m
     NotificationsModule,
   ],
   controllers: [AuthController],
-  providers: [JwtStrategy, AuthService, PushNotificationsService],
   exports: [JwtStrategy, PassportModule, JwtModule],
 })
 
