@@ -32,8 +32,10 @@ export class PushNotificationsService {
         const toTokens = users.map((user) => user.token);
         const areExpoTokens = toTokens.every(Expo.isExpoPushToken);
 
+        console.log('Expo tokens:', toTokens);
+
         if (!areExpoTokens) {
-            throw new BadRequestException('Invalid expo push tokens');
+            return
         }
 
         const messages: ExpoPushMessage[] = toTokens.map((token) => ({
