@@ -1,5 +1,6 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { ServicesEntity } from "./services.entity";
+import { OneToManyNoAction } from "../decorators/relations.decorator";
 
 @Entity("statuses", { schema: "services_dbqa" })
 export class StatusesEntity {
@@ -21,6 +22,6 @@ export class StatusesEntity {
   })
   updatedAt: Date;
 
-  @OneToMany(() => ServicesEntity, (servicesEntity) => servicesEntity.status)
+  @OneToManyNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.status)
   services: ServicesEntity[];
 }

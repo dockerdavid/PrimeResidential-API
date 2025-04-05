@@ -1,11 +1,11 @@
 import {
   Column,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { UsersEntity } from "./users.entity";
 import { PermissionsByRoleEntity } from "./permissions_by_role";
+import { OneToManyNoAction } from "../decorators/relations.decorator";
 
 @Entity("roles", { schema: "services_dbqa" })
 export class RolesEntity {
@@ -27,9 +27,9 @@ export class RolesEntity {
   })
   updatedAt: Date;
 
-  @OneToMany(() => PermissionsByRoleEntity, (permissionsByRole) => permissionsByRole.role)
+  @OneToManyNoAction(() => PermissionsByRoleEntity, (permissionsByRole) => permissionsByRole.role)
   permissionsByRole: PermissionsByRoleEntity[];
 
-  @OneToMany(() => UsersEntity, (usersEntity) => usersEntity.role)
+  @OneToManyNoAction(() => UsersEntity, (usersEntity) => usersEntity.role)
   users: UsersEntity[];
 }

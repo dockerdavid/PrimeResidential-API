@@ -3,13 +3,12 @@ import {
   Entity,
   Index,
   JoinColumn,
-  ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { CommunitiesEntity } from "./communities.entity";
 import { ServicesEntity } from "./services.entity";
 import { RolesEntity } from "./roles.entity";
+import { ManyToOneNoAction, OneToManyNoAction } from "../decorators/relations.decorator";
 
 @Index("role_id", ["roleId"], {})
 @Entity("users", { schema: "services_dbqa" })
@@ -47,19 +46,14 @@ export class UsersEntity {
   })
   updatedAt: Date;
 
-  @OneToMany(
-    () => CommunitiesEntity,
-    (communitiesEntity) => communitiesEntity.user
+  @OneToManyNoAction(() => CommunitiesEntity, (communitiesEntity) => communitiesEntity.user
   )
   communities: CommunitiesEntity[];
 
-  @OneToMany(() => ServicesEntity, (servicesEntity) => servicesEntity.user)
+  @OneToManyNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.user)
   services: ServicesEntity[];
 
-  @ManyToOne(() => RolesEntity, (rolesEntity) => rolesEntity.users, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
+  @ManyToOneNoAction(() => RolesEntity, (rolesEntity) => rolesEntity.users,)
   @JoinColumn([{ name: "role_id", referencedColumnName: "id" }])
   role: RolesEntity;
 }

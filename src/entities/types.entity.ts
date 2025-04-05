@@ -3,12 +3,11 @@ import {
   Entity,
   Index,
   JoinColumn,
-  ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { ServicesEntity } from "./services.entity";
 import { CommunitiesEntity } from "./communities.entity";
+import { ManyToOneNoAction, OneToManyNoAction } from "../decorators/relations.decorator";
 
 @Index("community_id", ["communityId"], {})
 @Entity("types", { schema: "services_dbqa" })
@@ -48,14 +47,10 @@ export class TypesEntity {
   })
   updatedAt: Date;
 
-  @OneToMany(() => ServicesEntity, (servicesEntity) => servicesEntity.type)
+  @OneToManyNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.type)
   services: ServicesEntity[];
 
-  @ManyToOne(
-    () => CommunitiesEntity,
-    (communitiesEntity) => communitiesEntity.types,
-    { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
-  )
+  @ManyToOneNoAction(() => CommunitiesEntity, (communitiesEntity) => communitiesEntity.types)
   @JoinColumn([{ name: "community_id", referencedColumnName: "id" }])
   community: CommunitiesEntity;
 }

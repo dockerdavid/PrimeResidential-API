@@ -3,14 +3,13 @@ import {
   Entity,
   Index,
   JoinColumn,
-  ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { CompaniesEntity } from "./companies.entity";
 import { ServicesEntity } from "./services.entity";
 import { TypesEntity } from "./types.entity";
 import { UsersEntity } from "./users.entity";
+import { ManyToOneNoAction, OneToManyNoAction } from "../decorators/relations.decorator";
 
 @Index("company_id", ["companyId"], {})
 @Index("user_id", ["userId"], {})
@@ -40,24 +39,17 @@ export class CommunitiesEntity {
   })
   updatedAt: Date;
 
-  @ManyToOne(
-    () => CompaniesEntity,
-    (companiesEntity) => companiesEntity.communities,
-    { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
-  )
+  @ManyToOneNoAction(() => CompaniesEntity, (companiesEntity) => companiesEntity.communities)
   @JoinColumn([{ name: "company_id", referencedColumnName: "id" }])
   company: CompaniesEntity;
 
-  @ManyToOne(() => UsersEntity, (usersEntity) => usersEntity.communities, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
+  @ManyToOneNoAction(() => UsersEntity, (usersEntity) => usersEntity.communities)
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
   user: UsersEntity;
 
-  @OneToMany(() => ServicesEntity, (servicesEntity) => servicesEntity.community)
+  @OneToManyNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.community)
   services: ServicesEntity[];
 
-  @OneToMany(() => TypesEntity, (typesEntity) => typesEntity.community)
+  @OneToManyNoAction(() => TypesEntity, (typesEntity) => typesEntity.community)
   types: TypesEntity[];
 }

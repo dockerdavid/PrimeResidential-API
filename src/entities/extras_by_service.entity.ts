@@ -3,11 +3,11 @@ import {
   Entity,
   Index,
   JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { ServicesEntity } from "./services.entity";
 import { ExtrasEntity } from "./extras.entity";
+import { ManyToOneNoAction } from "../decorators/relations.decorator";
 
 @Index("extra_id", ["extraId"], {})
 @Index("service_id", ["serviceId"], {})
@@ -34,19 +34,11 @@ export class ExtrasByServiceEntity {
   })
   updatedAt: Date;
 
-  @ManyToOne(
-    () => ServicesEntity,
-    (servicesEntity) => servicesEntity.extrasByServices,
-    { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
-  )
+  @ManyToOneNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.extrasByServices)
   @JoinColumn([{ name: "service_id", referencedColumnName: "id" }])
   service: ServicesEntity;
 
-  @ManyToOne(
-    () => ExtrasEntity,
-    (extrasEntity) => extrasEntity.extrasByServices,
-    { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
-  )
+  @ManyToOneNoAction(() => ExtrasEntity, (extrasEntity) => extrasEntity.extrasByServices)
   @JoinColumn([{ name: "extra_id", referencedColumnName: "id" }])
   extra: ExtrasEntity;
 }

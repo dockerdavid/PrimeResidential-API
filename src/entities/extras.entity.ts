@@ -1,5 +1,6 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { ExtrasByServiceEntity } from "./extras_by_service.entity";
+import { OneToManyNoAction } from "../decorators/relations.decorator";
 
 @Entity("extras", { schema: "services_dbqa" })
 export class ExtrasEntity {
@@ -32,9 +33,6 @@ export class ExtrasEntity {
   })
   updatedAt: Date;
 
-  @OneToMany(
-    () => ExtrasByServiceEntity,
-    (extrasByServiceEntity) => extrasByServiceEntity.extra
-  )
+  @OneToManyNoAction(() => ExtrasByServiceEntity, (extrasByServiceEntity) => extrasByServiceEntity.extra)
   extrasByServices: ExtrasByServiceEntity[];
 }
