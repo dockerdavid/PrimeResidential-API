@@ -28,23 +28,21 @@ export class PushNotificationsService {
         useFcmV1: true,
     });
 
-    sendNotification(users: UsersEntity[], notification: PushNotification) {
-        console.log('users', users);
-        console.log('notification', notification);
-        const toTokens = users.map((user) => user.token);
-        const areExpoTokens = toTokens.every(Expo.isExpoPushToken);
+    sendNotification(toTokens: string[], notification: PushNotification) {
+        // const toTokens = users.map((user) => user.token);
+        // const areExpoTokens = toTokens.every(Expo.isExpoPushToken);
 
-        if (!areExpoTokens) {
-            return
-        }
+        // if (!areExpoTokens) {
+        //     return
+        // }
 
-        const messages: ExpoPushMessage[] = toTokens.map((token) => ({
-            to: token,
-            sound: notification.sound || 'default',
-            body: notification.body,
-            title: notification.title,
-            data: notification.data,
-        }));
+        // const messages: ExpoPushMessage[] = toTokens.map((token) => ({
+        //     to: token,
+        //     sound: notification.sound || 'default',
+        //     body: notification.body,
+        //     title: notification.title,
+        //     data: notification.data,
+        // }));
 
         const chunks = this.expo.chunkPushNotifications(messages);
         const tickets = [];

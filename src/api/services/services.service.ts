@@ -15,6 +15,7 @@ import { PageDto } from '../../dto/page.dto';
 import { PageMetaDto } from '../../dto/page-meta.dto';
 import { PushNotificationsService } from '../../push-notification/push-notification.service';
 import { UsersEntity } from '../../entities/users.entity';
+import { CommunitiesEntity } from '../../entities/communities.entity';
 
 export interface ServicesDashboard extends ServicesEntity {
   totalCleaner: number;
@@ -32,6 +33,8 @@ export class ServicesService {
     private readonly extrasByServiceRepository: Repository<ExtrasByServiceEntity>,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
+    @InjectRepository(CommunitiesEntity)
+    private readonly communitiesRepository: Repository<CommunitiesEntity>,
     private readonly pushNotificationService: PushNotificationsService,
   ) { }
 
@@ -248,26 +251,18 @@ export class ServicesService {
       await this.extrasByServiceRepository.save(extras);
     }
 
-    if (createServiceDto.userId) {
-      const user = await this.usersRepository.findOne({
-        where: { id: createServiceDto.userId },
-      });
+    const notification = {
+      body: `A new service has been created with ID: ${service.id}`,
+      title: 'New Service Created',
+      data: {
+        serviceId: service.id,
+        serviceType: service.type,
+        serviceDate: service.date,
+        serviceStatus: service.status,
+      },
+    };
 
-      if (user.token && user.token.length > 0) {
-        const notification = {
-          body: `A new service has been created with ID: ${service.id}`,
-          title: 'New Service Created',
-          data: {
-            serviceId: service.id,
-            serviceType: service.type,
-            serviceDate: service.date,
-            serviceStatus: service.status,
-          },
-        };
-
-        this.pushNotificationService.sendNotification([user], notification)
-      }
-    }
+    this.notifyInterestedParticipants(service, notification)
 
     return {
       service,
@@ -287,26 +282,18 @@ export class ServicesService {
 
     await this.servicesRepository.save(service);
 
-    if (updateServiceDto.userId) {
-      const user = await this.usersRepository.findOne({
-        where: { id: updateServiceDto.userId },
-      });
+    const notification = {
+      body: `The service with ID: ${service.id} has been updated`,
+      title: 'Service Updated',
+      data: {
+        serviceId: service.id,
+        serviceType: service.type,
+        serviceDate: service.date,
+        serviceStatus: service.status,
+      },
+    };
 
-      if (user.token && user.token.length > 0) {
-        const notification = {
-          body: `The service with ID: ${service.id} has been updated`,
-          title: 'Service Updated',
-          data: {
-            serviceId: service.id,
-            serviceType: service.type,
-            serviceDate: service.date,
-            serviceStatus: service.status,
-          },
-        };
-
-        this.pushNotificationService.sendNotification([user], notification)
-      }
-    }
+    this.notifyInterestedParticipants(service, notification)
 
     return service;
   }
@@ -320,21 +307,49 @@ export class ServicesService {
       throw new NotFoundException(`Service with ID ${id} not found`);
     }
 
-    if (service.user.token && service.user.token.length > 0) {
-      const notification = {
-        body: `The service with ID: ${service.id} has been removed`,
-        title: 'Service Removed',
-        data: {
-          serviceId: service.id,
-          serviceType: service.type,
-          serviceDate: service.date,
-          serviceStatus: service.status,
-        },
-      };
+    const notification = {
+      body: `The service with ID: ${service.id} has been removed`,
+      title: 'Service Removed',
+      data: {
+        serviceId: service.id,
+        serviceType: service.type,
+        serviceDate: service.date,
+        serviceStatus: service.status,
+      },
+    };
 
-      this.pushNotificationService.sendNotification([service.user], notification)
-    }
+    this.notifyInterestedParticipants(service, notification)
 
     return this.servicesRepository.remove(service);
+  }
+
+  private async notifyInterestedParticipants(
+    service: ServicesEntity,
+    notification: { body: string; title: string; data: any }
+  ) {
+    const cleanerToken = service.user.token;
+    const superAdminTokens = await this.usersRepository.find({
+      where: { roleId: '1' },
+      select: ['token'],
+    });
+
+    const communitiesToken = await this.communitiesRepository.find({
+      where: { id: service.communityId },
+      relations: ['users'],
+    });
+
+    const communityUsers = communitiesToken.flatMap(community => community.user);
+    const communityTokens = communityUsers.map(user => user.token);
+
+    const allTokens = [cleanerToken, ...superAdminTokens.map(user => user.token), ...communityTokens];
+    const uniqueTokens = Array.from(new Set(allTokens));
+
+    const notificationData = {
+      body: notification.body,
+      title: notification.title,
+      data: notification.data,
+    };
+
+    return this.pushNotificationService.sendNotification(uniqueTokens, notificationData)
   }
 }

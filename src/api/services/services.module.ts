@@ -6,14 +6,14 @@ import { ServicesService } from './services.service';
 import { ServicesEntity } from '../../entities/services.entity';
 import { ExtrasByServiceEntity } from '../../entities/extras_by_service.entity';
 import { UsersEntity } from '../../entities/users.entity';
-import { PushNotificationsService } from '../../push-notification/push-notification.service';
 import { NotificationsModule } from '../../push-notification/push-notification.module';
+import { CommunitiesEntity } from '../../entities/communities.entity';
 
 @Module({
   controllers: [ServicesController],
   providers: [ServicesService],
   imports: [
-    TypeOrmModule.forFeature([ServicesEntity, ExtrasByServiceEntity, UsersEntity]),
+    TypeOrmModule.forFeature([ServicesEntity, ExtrasByServiceEntity, UsersEntity, CommunitiesEntity]),
     NotificationsModule,
   ],
 
