@@ -52,6 +52,7 @@ export class PushNotificationsService {
                 const ticketChunk = this.expo.sendPushNotificationsAsync(chunk);
                 tickets.push(ticketChunk);
             } catch (error) {
+                console.log(error);
             }
         }
 
@@ -61,8 +62,8 @@ export class PushNotificationsService {
                 from: envVars.TWILIO_SENDER_NUMBER,
                 to: user.phoneNumber,
             })
-            .then((_: any) => {})
-            .catch((_: any) => {});
+                .then((message: any) => console.log('SMS sent successfully:', message.sid))
+                .catch((error: any) => console.error('Error sending SMS:', error));
         });
 
         return {
