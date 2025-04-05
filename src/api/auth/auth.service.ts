@@ -31,6 +31,8 @@ export class AuthService {
 
     delete user.password;
 
+    console.log(token)
+
     if (token) {
       await this.usersRepository.update(user.id, { token });
 
