@@ -280,6 +280,31 @@ export class ServicesService {
       throw new NotFoundException(`Service with ID ${id} not found`);
     }
 
+    if (updateServiceDto.extraId) {
+      const extras = await this.extrasByServiceRepository.find({
+        where: { serviceId: id },
+      });
+
+      const extrasToRemove = extras.filter(
+        extra => !updateServiceDto.extraId.includes(extra.extraId)
+      );
+
+      if (extrasToRemove.length > 0) {
+        await this.extrasByServiceRepository.remove(extrasToRemove);
+      }
+
+      const extrasToAdd = updateServiceDto.extraId.filter(
+        extraId => !extras.some(extra => extra.extraId === extraId)
+      );
+
+      if (extrasToAdd.length > 0) {
+        const newExtras = extrasToAdd.map(extraId =>
+          this.extrasByServiceRepository.create({ serviceId: id, extraId })
+        );
+        await this.extrasByServiceRepository.save(newExtras);
+      }
+    }
+
     await this.servicesRepository.save(service);
 
     const notification = {
