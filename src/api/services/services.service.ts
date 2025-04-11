@@ -354,7 +354,7 @@ export class ServicesService {
   ) {
     const superAdmins = await this.usersRepository.find({
       where: { roleId: '1' },
-      select: ['id', 'token'],
+      select: ['id', 'token', 'phoneNumber'],
     });
 
     const communities = await this.communitiesRepository.find({
@@ -362,17 +362,32 @@ export class ServicesService {
       relations: ['user'],
     });
 
-    const communityUsers = communities
-      .map(c => c.user)
+    const communityUserIds = communities
+      .map(c => c.user?.id)
       .filter(Boolean);
 
+    const fullCommunityUsers = communityUserIds.length
+      ? await this.usersRepository.findBy({
+        id: In(communityUserIds),
+      })
+      : [];
+
+    let serviceUser = null;
+    if (service.user?.id) {
+      serviceUser = await this.usersRepository.findOne({
+        where: { id: service.user.id },
+        select: ['id', 'token', 'phoneNumber'],
+      });
+    }
+
     const allUsers = [
-      ...(service.user ? [service.user] : []),
+      ...(serviceUser ? [serviceUser] : []),
       ...superAdmins,
-      ...communityUsers,
+      ...fullCommunityUsers,
     ].filter(
       (user, index, self) =>
-        user?.token && self.findIndex(u => u.token === user.token) === index
+        user?.token &&
+        self.findIndex(u => u.token === user.token) === index
     );
 
     console.log('allUsers', allUsers);
