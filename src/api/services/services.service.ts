@@ -375,6 +375,8 @@ export class ServicesService {
         user?.token && self.findIndex(u => u.token === user.token) === index
     );
 
+    console.log('allUsers', allUsers);
+
     const uniqueTokens = allUsers.map(u => u.token);
 
     if (uniqueTokens.length === 0) return;
