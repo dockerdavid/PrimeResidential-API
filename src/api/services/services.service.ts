@@ -394,8 +394,6 @@ export class ServicesService {
 
     const uniqueTokens = allUsers.map(u => u.token);
 
-    if (uniqueTokens.length === 0) return;
-
     return this.pushNotificationService.sendNotification({
       body: notification.body,
       title: notification.title,
