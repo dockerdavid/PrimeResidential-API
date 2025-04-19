@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { In, Repository } from 'typeorm';
+import moment from 'moment';
 
 import { ServicesByManagerDto } from './dto/services-by-manager.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -235,6 +236,26 @@ export class ServicesService {
     const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
 
     return new PageDto(items, pageMetaDto);
+  }
+
+  async findByCleanerAndDate(userId: string, date: string, pageOptionsDto: PageOptionsDto) {
+    const startOfWeek = moment(date).startOf('isoWeek').format('YYYY-MM-DD');
+    const endOfWeek = moment(date).endOf('isoWeek').format('YYYY-MM-DD');
+
+    const queryBuilder = this.servicesRepository.createQueryBuilder('services')
+      .leftJoinAndSelect('services.community', 'community')
+      .leftJoinAndSelect('services.type', 'type')
+      .leftJoinAndSelect('services.status', 'status')
+      .leftJoinAndSelect('services.user', 'user')
+      .leftJoinAndSelect('services.extrasByServices', 'extrasByServices')
+      .leftJoinAndSelect('extrasByServices.extra', 'extra')
+      .where('services.userId = :userId', { userId })
+      .andWhere('services.date BETWEEN :startOfWeek AND :endOfWeek', { startOfWeek, endOfWeek })
+      .orderBy('services.date', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+
+    return queryBuilder.getMany();
   }
 
   async create(createServiceDto: CreateServiceDto) {

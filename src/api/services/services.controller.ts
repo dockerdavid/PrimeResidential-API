@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ParseIntPipe, ParseDatePipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -67,6 +67,16 @@ export class ServicesController {
     @Query() pageOptionsDto: PageOptionsDto,
   ) {
     return this.servicesService.findByCleaner(userId, pageOptionsDto);
+  }
+
+  @Post('/by-cleaner-and-date/:userId/:date')
+  @UseGuards(AuthGuard('jwt'))
+  findByCleanerAndDate(
+    @Param('userId') userId: string,
+    @Param('date', new ParseDatePipe()) date: string,
+    @Query() pageOptionsDto: PageOptionsDto,
+  ) {
+    return this.servicesService.findByCleanerAndDate(userId, date, pageOptionsDto);
   }
 
   @Post('/by-communities')
