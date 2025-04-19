@@ -238,7 +238,7 @@ export class ServicesService {
     return new PageDto(items, pageMetaDto);
   }
 
-  async findByCleanerAndDate(userId: string, date: string, pageOptionsDto: PageOptionsDto) {
+  async findByCleanerAndDate(userId: string, date: string) {
     const startOfWeek = moment(date).startOf('isoWeek').format('YYYY-MM-DD');
     const endOfWeek = moment(date).endOf('isoWeek').format('YYYY-MM-DD');
 
@@ -251,9 +251,6 @@ export class ServicesService {
       .leftJoinAndSelect('extrasByServices.extra', 'extra')
       .where('services.userId = :userId', { userId })
       .andWhere('services.date BETWEEN :startOfWeek AND :endOfWeek', { startOfWeek, endOfWeek })
-      .orderBy('services.date', pageOptionsDto.order)
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take)
 
     return queryBuilder.getMany();
   }

@@ -74,9 +74,8 @@ export class ServicesController {
   findByCleanerAndDate(
     @Param('userId') userId: string,
     @Param('date', new ParseDatePipe()) date: string,
-    @Query() pageOptionsDto: PageOptionsDto,
   ) {
-    return this.servicesService.findByCleanerAndDate(userId, date, pageOptionsDto);
+    return this.servicesService.findByCleanerAndDate(userId, date);
   }
 
   @Post('/by-communities')
