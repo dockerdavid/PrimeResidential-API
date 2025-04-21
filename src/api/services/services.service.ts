@@ -344,7 +344,7 @@ export class ServicesService {
       '2': `You have a new service for ${moment(fullService.date).format('DD/MM/YYYY')} in ${fullService.community?.communityName ?? 'Unknown Community'}`,
       '3': `Approved by ${fullService.user?.name ?? 'Unknown'} in ${fullService.community?.communityName ?? 'Unknown Community'} for ${moment(fullService.date).format('DD/MM/YYYY')}`,
       '4': `The cleaner ${fullService.user?.name ?? 'Unknown'} has rejected the service in ${fullService.community?.communityName ?? 'Unknown Community'} on ${moment(fullService.date).format('DD/MM/YYYY')}`,
-      '5': `Completed by ${fullService.user?.name ?? 'Unknown'} in ${fullService.community?.communityName ?? 'Unknown Community'} on ${moment(fullService.date).format('DD/MM/YYYY')}`,
+      '5': `Finished by ${fullService.user?.name ?? 'Unknown'} in ${fullService.community?.communityName ?? 'Unknown Community'} on ${moment(fullService.date).format('DD/MM/YYYY')}`,
     };
   
     const statusMessage = statusMessages[fullService.status?.id];
