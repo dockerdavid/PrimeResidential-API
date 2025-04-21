@@ -28,9 +28,8 @@ import { TwilioModule } from 'nestjs-twilio';
       password: envVars.DB_PASSWORD,
       database: envVars.DB_DATABASE,
       entities: [__dirname + '/entities/*.entity{.ts,.js}'],
-      synchronize: false,
+      synchronize: true,
       autoLoadEntities: true,
-      migrationsRun: true,
     }),
 
     AuthModule,
