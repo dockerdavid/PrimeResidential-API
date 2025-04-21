@@ -1,13 +1,11 @@
 import {
   Column,
   Entity,
-  Index,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { PermissionsByRoleEntity } from "./permissions_by_role";
 import { OneToManyNoAction } from "../decorators/relations.decorator";
 
-@Index("IDX_48ce552495d14eae9b187bb671", ["name"], { unique: true })
 @Entity("permissions", { schema: "services_dbqa" })
 export class PermissionsEntity {
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })

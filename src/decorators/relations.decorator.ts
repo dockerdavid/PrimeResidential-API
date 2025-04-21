@@ -13,8 +13,8 @@ export function ManyToOneNoAction<T>(
     options: RelationOptions = {}
 ): PropertyDecorator {
     return ManyToOne(type, inverseSide, {
-        onDelete: "NO ACTION",
-        onUpdate: "NO ACTION",
+        onDelete: "SET NULL",
+        onUpdate: "SET NULL",
         ...options,
     });
 }
@@ -25,8 +25,8 @@ export function OneToOneNoAction<T>(
     options: RelationOptions = {}
 ): PropertyDecorator {
     return OneToOne(type, inverseSide, {
-        onDelete: "NO ACTION",
-        onUpdate: "NO ACTION",
+        onDelete: "SET NULL",
+        onUpdate: "SET NULL",
         ...options,
     });
 }
@@ -37,8 +37,8 @@ export function ManyToManyNoAction<T>(
     options: RelationOptions = {}
 ): PropertyDecorator {
     return ManyToMany(type, inverseSide, {
-        onDelete: "NO ACTION",
-        onUpdate: "NO ACTION",
+        onDelete: "SET NULL",
+        onUpdate: "SET NULL",
         ...options,
     });
 }
@@ -49,8 +49,8 @@ export function OneToManyNoAction<T>(
     options: RelationOptions = {}
 ): PropertyDecorator {
     return OneToMany(type, inverseSide, {
-        onDelete: "NO ACTION",
-        onUpdate: "NO ACTION",
+        onDelete: "SET NULL",
+        onUpdate: "SET NULL",
         ...options,
     });
 }

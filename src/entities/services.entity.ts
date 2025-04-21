@@ -39,14 +39,14 @@ export class ServicesEntity {
   @Column("varchar", { name: "unit_number", length: 191 })
   unitNumber: string;
 
-  @Column("bigint", { name: "community_id", unsigned: true })
-  communityId: string;
+  @Column("bigint", { name: "community_id", unsigned: true, nullable: true })
+  communityId: string | null;
 
-  @Column("bigint", { name: "type_id", unsigned: true })
-  typeId: string;
+  @Column("bigint", { name: "type_id", unsigned: true, nullable: true })
+  typeId: string | null;
 
-  @Column("bigint", { name: "status_id", unsigned: true })
-  statusId: string;
+  @Column("bigint", { name: "status_id", unsigned: true, nullable: true })
+  statusId: string | null;
 
   @Column("bigint", { name: "user_id", nullable: true, unsigned: true })
   userId: string | null;
@@ -71,17 +71,17 @@ export class ServicesEntity {
 
   @ManyToOneNoAction(() => StatusesEntity, (statusesEntity) => statusesEntity.services)
   @JoinColumn([{ name: "status_id", referencedColumnName: "id" }])
-  status: StatusesEntity;
+  status: StatusesEntity | null;
 
   @ManyToOneNoAction(() => CommunitiesEntity, (communitiesEntity) => communitiesEntity.services)
   @JoinColumn([{ name: "community_id", referencedColumnName: "id" }])
-  community: CommunitiesEntity;
+  community: CommunitiesEntity | null;
 
   @ManyToOneNoAction(() => UsersEntity, (usersEntity) => usersEntity.services)
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: UsersEntity;
+  user: UsersEntity | null;
 
   @ManyToOneNoAction(() => TypesEntity, (typesEntity) => typesEntity.services)
   @JoinColumn([{ name: "type_id", referencedColumnName: "id" }])
-  type: TypesEntity;
+  type: TypesEntity | null;
 }

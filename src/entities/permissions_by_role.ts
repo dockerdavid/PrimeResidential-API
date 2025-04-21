@@ -8,6 +8,8 @@ import { PermissionsEntity } from "./permissions.entity";
 import { RolesEntity } from "./roles.entity";
 import { ManyToOneNoAction } from "../decorators/relations.decorator";
 
+@Index("idx_permission_id", ["permissionId"])
+@Index("idx_role_id", ["roleId"])
 @Entity("permissions_by_role", { schema: "services_dbqa" })
 export class PermissionsByRoleEntity {
   @PrimaryColumn({ type: "bigint", unsigned: true, name: "permission_id" })
@@ -16,13 +18,19 @@ export class PermissionsByRoleEntity {
   @PrimaryColumn({ type: "bigint", unsigned: true, name: "role_id" })
   roleId: string;
 
-  @ManyToOneNoAction(() => PermissionsEntity, (permission) => permission.permissionsByRole)
+  @ManyToOneNoAction(() => PermissionsEntity, permission => permission.permissionsByRole, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+    nullable: false,
+  })
   @JoinColumn({ name: "permission_id" })
-  @Index("IDX_25e8534db320b3bf23caa4fbc9")
   permission: PermissionsEntity;
 
-  @ManyToOneNoAction(() => RolesEntity, (role) => role.permissionsByRole)
+  @ManyToOneNoAction(() => RolesEntity, role => role.permissionsByRole, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+    nullable: false,
+  })
   @JoinColumn({ name: "role_id" })
-  @Index("IDX_8550102b804d6606c91c87bac3")
   role: RolesEntity;
 }

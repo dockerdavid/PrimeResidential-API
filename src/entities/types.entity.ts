@@ -5,8 +5,8 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { ServicesEntity } from "./services.entity";
 import { CommunitiesEntity } from "./communities.entity";
+import { ServicesEntity } from "./services.entity";
 import { ManyToOneNoAction, OneToManyNoAction } from "../decorators/relations.decorator";
 
 @Index("community_id", ["communityId"], {})
@@ -32,8 +32,12 @@ export class TypesEntity {
   })
   commission: number;
 
-  @Column("bigint", { name: "community_id", unsigned: true })
-  communityId: string;
+  @Column("bigint", {
+    name: "community_id",
+    unsigned: true,
+    nullable: true,
+  })
+  communityId: string | null;
 
   @Column("timestamp", {
     name: "created_at",
@@ -52,5 +56,5 @@ export class TypesEntity {
 
   @ManyToOneNoAction(() => CommunitiesEntity, (communitiesEntity) => communitiesEntity.types)
   @JoinColumn([{ name: "community_id", referencedColumnName: "id" }])
-  community: CommunitiesEntity;
+  community: CommunitiesEntity | null;
 }

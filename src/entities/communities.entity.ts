@@ -21,11 +21,19 @@ export class CommunitiesEntity {
   @Column("varchar", { name: "community_name", length: 80 })
   communityName: string;
 
-  @Column("bigint", { name: "user_id", unsigned: true })
-  userId: string;
+  @Column("bigint", {
+    name: "user_id",
+    unsigned: true,
+    nullable: true,
+  })
+  userId: string | null;
 
-  @Column("bigint", { name: "company_id", unsigned: true })
-  companyId: string;
+  @Column("bigint", {
+    name: "company_id",
+    unsigned: true,
+    nullable: true,
+  })
+  companyId: string | null;
 
   @Column("timestamp", {
     name: "created_at",
@@ -41,11 +49,11 @@ export class CommunitiesEntity {
 
   @ManyToOneNoAction(() => CompaniesEntity, (companiesEntity) => companiesEntity.communities)
   @JoinColumn([{ name: "company_id", referencedColumnName: "id" }])
-  company: CompaniesEntity;
+  company: CompaniesEntity | null;
 
   @ManyToOneNoAction(() => UsersEntity, (usersEntity) => usersEntity.communities)
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: UsersEntity;
+  user: UsersEntity | null;
 
   @OneToManyNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.community)
   services: ServicesEntity[];

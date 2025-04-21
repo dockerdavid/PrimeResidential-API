@@ -25,8 +25,12 @@ export class UsersEntity {
   @Column("varchar", { name: "phone_number", nullable: true, length: 25 })
   phoneNumber: string | null;
 
-  @Column("bigint", { name: "role_id", unsigned: true })
-  roleId: string;
+  @Column("bigint", {
+    name: "role_id",
+    unsigned: true,
+    nullable: true,
+  })
+  roleId: string | null;
 
   @Column("varchar", { name: "password", length: 255 })
   password: string;
@@ -46,14 +50,13 @@ export class UsersEntity {
   })
   updatedAt: Date;
 
-  @OneToManyNoAction(() => CommunitiesEntity, (communitiesEntity) => communitiesEntity.user
-  )
+  @OneToManyNoAction(() => CommunitiesEntity, (communitiesEntity) => communitiesEntity.user)
   communities: CommunitiesEntity[];
 
   @OneToManyNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.user)
   services: ServicesEntity[];
 
-  @ManyToOneNoAction(() => RolesEntity, (rolesEntity) => rolesEntity.users,)
+  @ManyToOneNoAction(() => RolesEntity, (rolesEntity) => rolesEntity.users)
   @JoinColumn([{ name: "role_id", referencedColumnName: "id" }])
-  role: RolesEntity;
+  role: RolesEntity | null;
 }

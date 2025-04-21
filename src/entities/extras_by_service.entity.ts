@@ -16,11 +16,11 @@ export class ExtrasByServiceEntity {
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
   id: string;
 
-  @Column("bigint", { name: "service_id", unsigned: true })
-  serviceId: string;
+  @Column("bigint", { name: "service_id", unsigned: true, nullable: true })
+  serviceId: string | null;
 
-  @Column("bigint", { name: "extra_id", unsigned: true })
-  extraId: string;
+  @Column("bigint", { name: "extra_id", unsigned: true, nullable: true })
+  extraId: string | null;
 
   @Column("timestamp", {
     name: "created_at",
@@ -36,9 +36,9 @@ export class ExtrasByServiceEntity {
 
   @ManyToOneNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.extrasByServices)
   @JoinColumn([{ name: "service_id", referencedColumnName: "id" }])
-  service: ServicesEntity;
+  service: ServicesEntity | null;
 
   @ManyToOneNoAction(() => ExtrasEntity, (extrasEntity) => extrasEntity.extrasByServices)
   @JoinColumn([{ name: "extra_id", referencedColumnName: "id" }])
-  extra: ExtrasEntity;
+  extra: ExtrasEntity | null;
 }
