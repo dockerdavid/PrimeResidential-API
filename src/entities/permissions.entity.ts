@@ -11,7 +11,7 @@ export class PermissionsEntity {
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
   id: string;
 
-  @Column("varchar", { name: "name", unique: true, length: 25 })
+  @Column("varchar", { name: "name", unique: true, length: 141 })
   name: string;
 
   @Column("timestamp", {
