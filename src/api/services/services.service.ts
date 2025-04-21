@@ -299,28 +299,28 @@ export class ServicesService {
       id,
       ...updateServiceDto,
     });
-
+  
     if (!service) {
       throw new NotFoundException(`Service with ID ${id} not found`);
     }
-
+  
     if (updateServiceDto.extraId) {
-      const extras = await this.extrasByServiceRepository.find({
+      const existingExtras = await this.extrasByServiceRepository.find({
         where: { serviceId: id },
       });
-
-      const extrasToRemove = extras.filter(
+  
+      const extrasToRemove = existingExtras.filter(
         extra => !updateServiceDto.extraId.includes(extra.extraId)
       );
-
+  
       if (extrasToRemove.length > 0) {
         await this.extrasByServiceRepository.remove(extrasToRemove);
       }
-
+  
       const extrasToAdd = updateServiceDto.extraId.filter(
-        extraId => !extras.some(extra => extra.extraId === extraId)
+        extraId => !existingExtras.some(extra => extra.extraId === extraId)
       );
-
+  
       if (extrasToAdd.length > 0) {
         const newExtras = extrasToAdd.map(extraId =>
           this.extrasByServiceRepository.create({ serviceId: id, extraId })
@@ -328,38 +328,44 @@ export class ServicesService {
         await this.extrasByServiceRepository.save(newExtras);
       }
     }
-
+  
     await this.servicesRepository.save(service);
-
-    console.log(service)
-
-    const statusMessages = {
-      '2': `You have a new service for ${moment(service.date).format('DD/MM/YYYY')} in ${service.community.communityName}`,
-      '3': `Approved by ${service.user?.name} in ${service.community.communityName} for ${moment(service.date).format('DD/MM/YYYY')}`,
-      '4': `The cleaner ${service.user?.name} has rejected the service in ${service.community.communityName} on ${moment(service.date).format('DD/MM/YYYY')}`,
-      '5': `Completed by ${service.user?.name} in ${service.community.communityName} on ${moment(service.date).format('DD/MM/YYYY')}`,
-    };
-
-    const statusMessage = statusMessages[service.status.id];
-
-    if (!statusMessage) {
-      throw new NotFoundException(`Status message not found for status ID ${service.status.id}`);
+  
+    const fullService = await this.servicesRepository.findOne({
+      where: { id },
+      relations: ['community', 'status', 'user', 'type'],
+    });
+  
+    if (!fullService) {
+      throw new NotFoundException(`Service with ID ${id} not found after update`);
     }
-
+  
+    const statusMessages: Record<string, string> = {
+      '2': `You have a new service for ${moment(fullService.date).format('DD/MM/YYYY')} in ${fullService.community?.communityName ?? 'Unknown Community'}`,
+      '3': `Approved by ${fullService.user?.name ?? 'Unknown'} in ${fullService.community?.communityName ?? 'Unknown Community'} for ${moment(fullService.date).format('DD/MM/YYYY')}`,
+      '4': `The cleaner ${fullService.user?.name ?? 'Unknown'} has rejected the service in ${fullService.community?.communityName ?? 'Unknown Community'} on ${moment(fullService.date).format('DD/MM/YYYY')}`,
+      '5': `Completed by ${fullService.user?.name ?? 'Unknown'} in ${fullService.community?.communityName ?? 'Unknown Community'} on ${moment(fullService.date).format('DD/MM/YYYY')}`,
+    };
+  
+    const statusMessage = statusMessages[fullService.status?.id];
+  
+    if (!statusMessage) {
+      throw new NotFoundException(`Status message not found for status ID ${fullService.status?.id}`);
+    }
     const notification = {
       body: statusMessage,
       title: 'Service Status Updated',
       data: {
-        serviceId: service.id,
-        serviceType: service.type,
-        serviceDate: service.date,
-        serviceStatus: service.status,
+        serviceId: fullService.id,
+        serviceType: fullService.type,
+        serviceDate: fullService.date,
+        serviceStatus: fullService.status,
       },
     };
-
-    this.notifyInterestedParticipants(service, notification)
-
-    return service;
+  
+    this.notifyInterestedParticipants(fullService, notification);
+  
+    return fullService;
   }
 
   async remove(id: string) {
