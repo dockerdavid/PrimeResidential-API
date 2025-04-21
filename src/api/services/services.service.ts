@@ -269,11 +269,13 @@ export class ServicesService {
       await this.extrasByServiceRepository.save(extras);
     }
 
-
-    console.log(JSON.stringify(service, null, 2))
+    const fullService = await this.servicesRepository.findOne({
+      where: { id: service.id },
+      relations: ['community', 'status', 'type'],
+    });
 
     const notification = {
-      body: `New service created for ${service.community.communityName} on ${moment(service.date).format('DD/MM/YYYY')} in apartment number ${service.unitNumber}`,
+      body: `New service created for ${fullService.community?.communityName ?? 'Unknown Community'} on ${moment(fullService.date).format('DD/MM/YYYY')} in apartment number ${fullService.unitNumber}`,
       title: 'New Service Created',
       data: {
         serviceId: service.id,
@@ -283,13 +285,14 @@ export class ServicesService {
       },
     };
 
-    this.notifyInterestedParticipants(service, notification)
+    this.notifyInterestedParticipants(fullService, notification);
 
     return {
-      service,
+      service: fullService,
       extras,
     };
   }
+
 
   async update(id: string, updateServiceDto: UpdateServiceDto) {
     const service = await this.servicesRepository.preload({
