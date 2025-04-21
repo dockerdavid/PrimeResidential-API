@@ -269,6 +269,9 @@ export class ServicesService {
       await this.extrasByServiceRepository.save(extras);
     }
 
+
+    console.log(JSON.stringify(service, null, 2))
+
     const notification = {
       body: `New service created for ${service.community.communityName} on ${moment(service.date).format('DD/MM/YYYY')} in apartment number ${service.unitNumber}`,
       title: 'New Service Created',
