@@ -325,6 +325,8 @@ export class ServicesService {
 
     await this.servicesRepository.save(service);
 
+    console.log(service)
+
     const statusMessages = {
       '2': `You have a new service for ${moment(service.date).format('DD/MM/YYYY')} in ${service.community.communityName}`,
       '3': `Approved by ${service.user?.name} in ${service.community.communityName} for ${moment(service.date).format('DD/MM/YYYY')}`,
