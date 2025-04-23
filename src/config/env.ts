@@ -15,6 +15,8 @@ interface EnvVars {
     JWT_SECRET: string
     PORT: number
     EXPO_ACCESS_TOKEN: string
+    ENABLE_NOTIFICATIONS: boolean
+    ENABLE_SMS: boolean
 }
 
 const envSchema = joi
@@ -31,6 +33,8 @@ const envSchema = joi
     JWT_SECRET: joi.string().required(),
     PORT: joi.number().default(3000),
     EXPO_ACCESS_TOKEN: joi.string().required(),
+    ENABLE_NOTIFICATIONS: joi.boolean().default(false),
+    ENABLE_SMS: joi.boolean().default(false),
   })
   .unknown(true)
   .required();

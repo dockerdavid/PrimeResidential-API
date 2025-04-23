@@ -34,6 +34,12 @@ export class PushNotificationsService {
     });
 
     sendNotification(pushNotification: PushNotification) {
+        if (!envVars.ENABLE_NOTIFICATIONS) {
+            return {
+                done: true,
+            };
+        }
+
         const areExpoTokens = pushNotification.tokensNotification.tokens.every(Expo.isExpoPushToken);
 
         if (!areExpoTokens) {
