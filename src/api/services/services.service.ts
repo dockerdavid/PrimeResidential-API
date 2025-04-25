@@ -84,7 +84,10 @@ export class ServicesService {
 
     const servicesDashboard = items.map(service => {
       const totalExtrasByService = service.extrasByServices.reduce((acc, extraByService) => {
-        return acc + Number(extraByService.extra.commission);
+        if (extraByService.extra && extraByService.extra.commission) {
+          return acc + Number(extraByService.extra.commission);
+        }
+        return acc;
       }, 0);
 
       const totalCleaner = Number(totalExtrasByService) + Number(service.type.commission);
