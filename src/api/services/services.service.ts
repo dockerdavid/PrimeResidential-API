@@ -83,19 +83,20 @@ export class ServicesService {
     const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
 
     const servicesDashboard = items.map(service => {
-      const totalExtrasByService = service.extrasByServices.reduce((acc, extraByService) => {
-        if (extraByService.extra && extraByService.extra.commission) {
-          return acc + Number(extraByService.extra.commission);
-        }
-        return acc;
-      }, 0);
-
-      const totalCleaner = Number(totalExtrasByService) + Number(service.type.commission);
-      const totalNotAdjusted = Number(service.type.price) - Number(service.type.commission) - Number(totalExtrasByService);
-
+      const totalExtrasByService = service.extrasByServices?.reduce((acc, extraByService) => {
+        const commission = extraByService.extra?.commission;
+        return acc + (commission ? Number(commission) : 0);
+      }, 0) ?? 0;
+    
+      const typeCommission = service.type?.commission ?? 0;
+      const typePrice = service.type?.price ?? 0;
+    
+      const totalCleaner = Number(totalExtrasByService) + Number(typeCommission);
+      const totalNotAdjusted = Number(typePrice) - Number(typeCommission) - Number(totalExtrasByService);
+    
       const totalParner = totalNotAdjusted * 0.4;
       const total = totalNotAdjusted * 0.6;
-
+    
       return {
         ...service,
         totalCleaner,
@@ -103,6 +104,7 @@ export class ServicesService {
         total,
       };
     });
+    
 
     return new PageDto(servicesDashboard, pageMetaDto);
   }
