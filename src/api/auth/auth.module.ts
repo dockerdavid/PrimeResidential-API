@@ -21,7 +21,7 @@ import { NotificationsModule } from '../../push-notification/push-notification.m
     }),
     JwtModule.register({
       secret: envVars.JWT_SECRET,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '365d' },
     }),
     TypeOrmModule.forFeature([UsersEntity]),
     NotificationsModule,
