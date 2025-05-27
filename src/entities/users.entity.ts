@@ -35,7 +35,7 @@ export class UsersEntity {
   @Column("varchar", { name: "password", length: 255 })
   password: string;
 
-  @Column("varchar", { name: "token", length: 255 })
+  @Column("varchar", { name: "token", length: 255, default: '' })
   token: string;
 
   @Column("timestamp", {
