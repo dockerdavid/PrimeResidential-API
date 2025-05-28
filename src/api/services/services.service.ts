@@ -213,9 +213,21 @@ export class ServicesService {
     }
 
     const [items, totalCount] = await queryBuilder.getManyAndCount();
+    
+    // Set commission to 0 if it exists in type
+    const modifiedItems = items.map(service => {
+      if (service.type && service.type.commission !== undefined) {
+        service.type = {
+          ...service.type,
+          commission: 0
+        };
+      }
+      return service;
+    });
+
     const pageMetaDto = new PageMetaDto({ totalCount, pageOptionsDto });
 
-    return new PageDto(items, pageMetaDto);
+    return new PageDto(modifiedItems, pageMetaDto);
   }
 
   async findByStatus(
