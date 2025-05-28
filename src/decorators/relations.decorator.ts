@@ -16,6 +16,7 @@ export function ManyToOneNoAction<T>(
         onDelete: "SET NULL",
         onUpdate: "SET NULL",
         ...options,
+        nullable: true,
     });
 }
 
@@ -28,6 +29,7 @@ export function OneToOneNoAction<T>(
         onDelete: "SET NULL",
         onUpdate: "SET NULL",
         ...options,
+        nullable: true,
     });
 }
 
@@ -40,6 +42,7 @@ export function ManyToManyNoAction<T>(
         onDelete: "SET NULL",
         onUpdate: "SET NULL",
         ...options,
+        nullable: true,
     });
 }
 
@@ -52,5 +55,6 @@ export function OneToManyNoAction<T>(
         onDelete: "SET NULL",
         onUpdate: "SET NULL",
         ...options,
+        nullable: true,
     });
 }
