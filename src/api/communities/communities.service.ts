@@ -30,11 +30,11 @@ export class CommunitiesService {
 
   async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<CommunitiesEntity>> {
     const searchedItemsByWord = this.communitiesRepository.createQueryBuilder('communities')
-      .innerJoinAndSelect('communities.supervisorUser', 'supervisorUser')
-      .innerJoinAndSelect('communities.managerUser', 'managerUser')
-      .innerJoinAndSelect('communities.company', 'company')
-      .innerJoinAndSelect('supervisorUser.role', 'supervisorRole')
-      .innerJoinAndSelect('managerUser.role', 'managerRole')
+      .leftJoinAndSelect('communities.supervisorUser', 'supervisorUser')
+      .leftJoinAndSelect('communities.managerUser', 'managerUser')
+      .leftJoinAndSelect('communities.company', 'company')
+      .leftJoinAndSelect('supervisorUser.role', 'supervisorRole')
+      .leftJoinAndSelect('managerUser.role', 'managerRole')
       .orderBy('communities.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
@@ -78,11 +78,11 @@ export class CommunitiesService {
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<CommunitiesEntity>> {
     const queryBuilder = this.communitiesRepository.createQueryBuilder('communities')
-      .innerJoinAndSelect('communities.supervisorUser', 'supervisorUser')
-      .innerJoinAndSelect('communities.managerUser', 'managerUser')
-      .innerJoinAndSelect('communities.company', 'company')
-      .innerJoinAndSelect('supervisorUser.role', 'supervisorRole')
-      .innerJoinAndSelect('managerUser.role', 'managerRole')
+      .leftJoinAndSelect('communities.supervisorUser', 'supervisorUser')
+      .leftJoinAndSelect('communities.managerUser', 'managerUser')
+      .leftJoinAndSelect('communities.company', 'company')
+      .leftJoinAndSelect('supervisorUser.role', 'supervisorRole')
+      .leftJoinAndSelect('managerUser.role', 'managerRole')
       .orderBy('communities.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
@@ -116,11 +116,11 @@ export class CommunitiesService {
 
   async findAllByManager(id: string) {
     const queryBuilder = this.communitiesRepository.createQueryBuilder('communities')
-      .innerJoinAndSelect('communities.supervisorUser', 'supervisorUser')
-      .innerJoinAndSelect('communities.managerUser', 'managerUser')
-      .innerJoinAndSelect('communities.company', 'company')
-      .innerJoinAndSelect('supervisorUser.role', 'supervisorRole')
-      .innerJoinAndSelect('managerUser.role', 'managerRole')
+      .leftJoinAndSelect('communities.supervisorUser', 'supervisorUser')
+      .leftJoinAndSelect('communities.managerUser', 'managerUser')
+      .leftJoinAndSelect('communities.company', 'company')
+      .leftJoinAndSelect('supervisorUser.role', 'supervisorRole')
+      .leftJoinAndSelect('managerUser.role', 'managerRole')
       .where('communities.supervisorUserId = :id OR communities.managerUserId = :id', { id })
       .select([
         'communities.id',
@@ -154,11 +154,11 @@ export class CommunitiesService {
 
   async findOne(id: string) {
     const community = await this.communitiesRepository.createQueryBuilder('communities')
-      .innerJoinAndSelect('communities.supervisorUser', 'supervisorUser')
-      .innerJoinAndSelect('communities.managerUser', 'managerUser')
-      .innerJoinAndSelect('communities.company', 'company')
-      .innerJoinAndSelect('supervisorUser.role', 'supervisorRole')
-      .innerJoinAndSelect('managerUser.role', 'managerRole')
+      .leftJoinAndSelect('communities.supervisorUser', 'supervisorUser')
+      .leftJoinAndSelect('communities.managerUser', 'managerUser')
+      .leftJoinAndSelect('communities.company', 'company')
+      .leftJoinAndSelect('supervisorUser.role', 'supervisorRole')
+      .leftJoinAndSelect('managerUser.role', 'managerRole')
       .where('communities.id = :id', { id })
       .select([
         'communities.id',
