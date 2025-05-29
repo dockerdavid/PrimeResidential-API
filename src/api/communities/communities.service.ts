@@ -30,9 +30,11 @@ export class CommunitiesService {
 
   async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<CommunitiesEntity>> {
     const searchedItemsByWord = this.communitiesRepository.createQueryBuilder('communities')
-      .innerJoinAndSelect('communities.user', 'user')
+      .innerJoinAndSelect('communities.supervisorUser', 'supervisorUser')
+      .innerJoinAndSelect('communities.managerUser', 'managerUser')
       .innerJoinAndSelect('communities.company', 'company')
-      .innerJoinAndSelect('user.role', 'role')
+      .innerJoinAndSelect('supervisorUser.role', 'supervisorRole')
+      .innerJoinAndSelect('managerUser.role', 'managerRole')
       .orderBy('communities.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
@@ -41,21 +43,31 @@ export class CommunitiesService {
         'communities.communityName',
         'communities.createdAt',
         'communities.updatedAt',
-        'user.id',
-        'user.name',
-        'user.email',
-        'user.phoneNumber',
+        'supervisorUser.id',
+        'supervisorUser.name',
+        'supervisorUser.email',
+        'supervisorUser.phoneNumber',
+        'managerUser.id',
+        'managerUser.name',
+        'managerUser.email',
+        'managerUser.phoneNumber',
         'company.id',
         'company.companyName',
-        'role.id',
-        'role.name',
+        'supervisorRole.id',
+        'supervisorRole.name',
+        'managerRole.id',
+        'managerRole.name',
       ])
       .where('communities.communityName like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
-      .orWhere('user.name like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
-      .orWhere('user.email like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
-      .orWhere('user.phoneNumber like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('supervisorUser.name like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('supervisorUser.email like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('supervisorUser.phoneNumber like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('managerUser.name like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('managerUser.email like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('managerUser.phoneNumber like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
       .orWhere('company.companyName like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
-      .orWhere('role.name like :searchWord', { searchWord: `%${searchDto.searchWord}%` });
+      .orWhere('supervisorRole.name like :searchWord', { searchWord: `%${searchDto.searchWord}%` })
+      .orWhere('managerRole.name like :searchWord', { searchWord: `%${searchDto.searchWord}%` });
 
     const [items, totalCount] = await searchedItemsByWord.getManyAndCount();
 
@@ -66,9 +78,11 @@ export class CommunitiesService {
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<CommunitiesEntity>> {
     const queryBuilder = this.communitiesRepository.createQueryBuilder('communities')
-      .innerJoinAndSelect('communities.user', 'user')
+      .innerJoinAndSelect('communities.supervisorUser', 'supervisorUser')
+      .innerJoinAndSelect('communities.managerUser', 'managerUser')
       .innerJoinAndSelect('communities.company', 'company')
-      .innerJoinAndSelect('user.role', 'role')
+      .innerJoinAndSelect('supervisorUser.role', 'supervisorRole')
+      .innerJoinAndSelect('managerUser.role', 'managerRole')
       .orderBy('communities.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
@@ -77,15 +91,21 @@ export class CommunitiesService {
         'communities.communityName',
         'communities.createdAt',
         'communities.updatedAt',
-        'user.id',
-        'user.name',
-        'user.email',
-        'user.phoneNumber',
+        'supervisorUser.id',
+        'supervisorUser.name',
+        'supervisorUser.email',
+        'supervisorUser.phoneNumber',
+        'managerUser.id',
+        'managerUser.name',
+        'managerUser.email',
+        'managerUser.phoneNumber',
         'company.id',
         'company.companyName',
-        'role.id',
-        'role.name',
-      ])
+        'supervisorRole.id',
+        'supervisorRole.name',
+        'managerRole.id',
+        'managerRole.name',
+      ]);
 
     const [items, totalCount] = await queryBuilder.getManyAndCount();
 
@@ -96,24 +116,32 @@ export class CommunitiesService {
 
   async findAllByManager(id: string) {
     const queryBuilder = this.communitiesRepository.createQueryBuilder('communities')
-      .innerJoinAndSelect('communities.user', 'user')
+      .innerJoinAndSelect('communities.supervisorUser', 'supervisorUser')
+      .innerJoinAndSelect('communities.managerUser', 'managerUser')
       .innerJoinAndSelect('communities.company', 'company')
-      .innerJoinAndSelect('user.role', 'role')
-      .where('communities.userId = :id', { id })
+      .innerJoinAndSelect('supervisorUser.role', 'supervisorRole')
+      .innerJoinAndSelect('managerUser.role', 'managerRole')
+      .where('communities.supervisorUserId = :id OR communities.managerUserId = :id', { id })
       .select([
         'communities.id',
         'communities.communityName',
         'communities.createdAt',
         'communities.updatedAt',
-        'user.id',
-        'user.name',
-        'user.email',
-        'user.phoneNumber',
+        'supervisorUser.id',
+        'supervisorUser.name',
+        'supervisorUser.email',
+        'supervisorUser.phoneNumber',
+        'managerUser.id',
+        'managerUser.name',
+        'managerUser.email',
+        'managerUser.phoneNumber',
         'company.id',
         'company.companyName',
-        'role.id',
-        'role.name',
-      ])
+        'supervisorRole.id',
+        'supervisorRole.name',
+        'managerRole.id',
+        'managerRole.name',
+      ]);
 
     const communities = await queryBuilder.getMany();
 
@@ -126,23 +154,31 @@ export class CommunitiesService {
 
   async findOne(id: string) {
     const community = await this.communitiesRepository.createQueryBuilder('communities')
-      .innerJoinAndSelect('communities.user', 'user')
+      .innerJoinAndSelect('communities.supervisorUser', 'supervisorUser')
+      .innerJoinAndSelect('communities.managerUser', 'managerUser')
       .innerJoinAndSelect('communities.company', 'company')
-      .innerJoinAndSelect('user.role', 'role')
+      .innerJoinAndSelect('supervisorUser.role', 'supervisorRole')
+      .innerJoinAndSelect('managerUser.role', 'managerRole')
       .where('communities.id = :id', { id })
       .select([
         'communities.id',
         'communities.communityName',
         'communities.createdAt',
         'communities.updatedAt',
-        'user.id',
-        'user.name',
-        'user.email',
-        'user.phoneNumber',
+        'supervisorUser.id',
+        'supervisorUser.name',
+        'supervisorUser.email',
+        'supervisorUser.phoneNumber',
+        'managerUser.id',
+        'managerUser.name',
+        'managerUser.email',
+        'managerUser.phoneNumber',
         'company.id',
         'company.companyName',
-        'role.id',
-        'role.name',
+        'supervisorRole.id',
+        'supervisorRole.name',
+        'managerRole.id',
+        'managerRole.name',
       ])
       .getOne();
 

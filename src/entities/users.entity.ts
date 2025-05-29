@@ -50,8 +50,11 @@ export class UsersEntity {
   })
   updatedAt: Date;
 
-  @OneToManyNoAction(() => CommunitiesEntity, (communitiesEntity) => communitiesEntity.user)
-  communities: CommunitiesEntity[];
+  @OneToManyNoAction(() => CommunitiesEntity, (communitiesEntity) => communitiesEntity.supervisorUser)
+  supervisedCommunities: CommunitiesEntity[];
+
+  @OneToManyNoAction(() => CommunitiesEntity, (communitiesEntity) => communitiesEntity.managerUser)
+  managedCommunities: CommunitiesEntity[];
 
   @OneToManyNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.user)
   services: ServicesEntity[];

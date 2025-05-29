@@ -421,11 +421,11 @@ export class ServicesService {
 
     const communities = await this.communitiesRepository.find({
       where: { id: service.communityId },
-      relations: ['user'],
+      relations: ['supervisorUser', 'managerUser'],
     });
 
     const communityUserIds = communities
-      .map(c => c.user?.id)
+      .flatMap(c => [c.supervisorUser?.id, c.managerUser?.id])
       .filter(Boolean);
 
     const fullCommunityUsers = communityUserIds.length

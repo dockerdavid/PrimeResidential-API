@@ -12,7 +12,8 @@ import { UsersEntity } from "./users.entity";
 import { ManyToOneNoAction, OneToManyNoAction } from "../decorators/relations.decorator";
 
 @Index("company_id", ["companyId"], {})
-@Index("user_id", ["userId"], {})
+@Index("supervisor_user_id", ["supervisorUserId"], {})
+@Index("manager_user_id", ["managerUserId"], {})
 @Entity("communities", { schema: "services_dbqa" })
 export class CommunitiesEntity {
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
@@ -22,11 +23,18 @@ export class CommunitiesEntity {
   communityName: string;
 
   @Column("bigint", {
-    name: "user_id",
+    name: "supervisor_user_id",
     unsigned: true,
     nullable: true,
   })
-  userId: string | null;
+  supervisorUserId: string | null;
+
+  @Column("bigint", {
+    name: "manager_user_id",
+    unsigned: true,
+    nullable: true,
+  })
+  managerUserId: string | null;
 
   @Column("bigint", {
     name: "company_id",
@@ -51,9 +59,13 @@ export class CommunitiesEntity {
   @JoinColumn([{ name: "company_id", referencedColumnName: "id" }])
   company: CompaniesEntity | null;
 
-  @ManyToOneNoAction(() => UsersEntity, (usersEntity) => usersEntity.communities)
-  @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: UsersEntity | null;
+  @ManyToOneNoAction(() => UsersEntity, (usersEntity) => usersEntity.supervisedCommunities)
+  @JoinColumn([{ name: "supervisor_user_id", referencedColumnName: "id" }])
+  supervisorUser: UsersEntity | null;
+
+  @ManyToOneNoAction(() => UsersEntity, (usersEntity) => usersEntity.managedCommunities)
+  @JoinColumn([{ name: "manager_user_id", referencedColumnName: "id" }])
+  managerUser: UsersEntity | null;
 
   @OneToManyNoAction(() => ServicesEntity, (servicesEntity) => servicesEntity.community)
   services: ServicesEntity[];
