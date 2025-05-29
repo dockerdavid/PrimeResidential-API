@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class CreateCommunityDto {
     @ApiProperty({ description: 'Nombre de la comunidad', maxLength: 80 })
@@ -7,10 +7,15 @@ export class CreateCommunityDto {
     @IsString()
     communityName: string;
 
-    @ApiProperty({ description: 'ID del usuario asociado', example: '1' })
-    @IsNotEmpty()
+    @ApiProperty({ description: 'ID del supervisor de la comunidad', example: '1', required: false })
+    @IsOptional()
     @IsString()
-    userId: string;
+    supervisorUserId?: string;
+
+    @ApiProperty({ description: 'ID del manager de la comunidad', example: '1', required: false })
+    @IsOptional()
+    @IsString()
+    managerUserId?: string;
 
     @ApiProperty({ description: 'ID de la compañía asociada', example: '1' })
     @IsNotEmpty()
