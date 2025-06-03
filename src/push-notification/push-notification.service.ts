@@ -1,5 +1,6 @@
 import {
     Injectable,
+    Logger,
 } from '@nestjs/common';
 
 import { Expo, ExpoPushMessage } from 'expo-server-sdk';
@@ -23,6 +24,7 @@ export interface PushNotification {
 
 @Injectable()
 export class PushNotificationsService {
+    private readonly logger = new Logger(PushNotificationsService.name);
 
     constructor(
         private readonly twilioService: TwilioService,
@@ -33,51 +35,75 @@ export class PushNotificationsService {
         useFcmV1: true,
     });
 
-    sendNotification(pushNotification: PushNotification) {
+    private async sendSMS(phoneNumber: string, message: string): Promise<boolean> {
+        try {
+            // Basic phone number validation
+            if (!phoneNumber || !phoneNumber.match(/^\+?[1-9]\d{1,14}$/)) {
+                this.logger.warn(`Invalid phone number format: ${phoneNumber}`);
+                return false;
+            }
+
+            const result = await this.twilioService.client.messages.create({
+                body: message,
+                from: envVars.TWILIO_SENDER_NUMBER,
+                to: phoneNumber,
+            });
+
+            this.logger.log(`SMS sent successfully to ${phoneNumber}, SID: ${result.sid}`);
+            return true;
+        } catch (error) {
+            this.logger.error(`Failed to send SMS to ${phoneNumber}: ${error.message}`, error.stack);
+            return false;
+        }
+    }
+
+    async sendNotification(pushNotification: PushNotification) {
         if (!envVars.ENABLE_NOTIFICATIONS) {
             return {
                 done: true,
             };
         }
 
+        // Handle Expo push notifications
         const areExpoTokens = pushNotification.tokensNotification.tokens.every(Expo.isExpoPushToken);
+        if (areExpoTokens) {
+            const messages: ExpoPushMessage[] = pushNotification.tokensNotification.tokens.map((token) => ({
+                to: token,
+                sound: pushNotification.sound || 'default',
+                body: pushNotification.body,
+                title: pushNotification.title,
+                data: pushNotification.data,
+            }));
 
-        if (!areExpoTokens) {
-            return
-        }
+            const chunks = this.expo.chunkPushNotifications(messages);
+            const tickets = [];
 
-        const messages: ExpoPushMessage[] = pushNotification.tokensNotification.tokens.map((token) => ({
-            to: token,
-            sound: pushNotification.sound || 'default',
-            body: pushNotification.body,
-            title: pushNotification.title,
-            data: pushNotification.data,
-        }));
-
-        const chunks = this.expo.chunkPushNotifications(messages);
-        const tickets = [];
-
-        for (const chunk of chunks) {
-            try {
-                const ticketChunk = this.expo.sendPushNotificationsAsync(chunk);
-                tickets.push(ticketChunk);
-            } catch (error) {
-                console.log(error);
+            for (const chunk of chunks) {
+                try {
+                    const ticketChunk = await this.expo.sendPushNotificationsAsync(chunk);
+                    tickets.push(ticketChunk);
+                } catch (error) {
+                    this.logger.error('Error sending push notification:', error);
+                }
             }
         }
 
-        pushNotification.tokensNotification.users.forEach((user) => {
-            this.twilioService.client.messages.create({
-                body: pushNotification.body,
-                from: envVars.TWILIO_SENDER_NUMBER,
-                to: user.phoneNumber,
-            })
-                .then((message: any) => console.log('SMS sent successfully:', message.sid))
-                .catch((error: any) => console.error('Error sending SMS:', error));
-        });
+        // Handle SMS notifications
+        const smsResults = await Promise.all(
+            pushNotification.tokensNotification.users.map(user => 
+                this.sendSMS(user.phoneNumber, pushNotification.body)
+            )
+        );
+
+        const failedSMS = smsResults.filter(result => !result).length;
+        if (failedSMS > 0) {
+            this.logger.warn(`${failedSMS} SMS messages failed to send`);
+        }
 
         return {
             done: true,
+            smsSent: smsResults.filter(result => result).length,
+            smsFailed: failedSMS,
         };
     }
 }
