@@ -110,6 +110,10 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
+    if (user.roleId === '6') {
+      user.roleId = '3';
+    }
+
     return user;
   }
 
