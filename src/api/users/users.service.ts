@@ -110,7 +110,12 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    if (user.roleId === '6') {
+    console.log('Current roleId:', user.roleId, 'Type:', typeof user.roleId);
+    
+    // Convert to string for comparison and handle both string and number types
+    const roleIdStr = String(user.roleId);
+    if (roleIdStr === '6') {
+      console.log('Converting roleId from 6 to 3');
       user.roleId = '3';
     }
 
