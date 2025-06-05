@@ -434,6 +434,8 @@ export class ServicesService {
       })
       : [];
 
+    console.log('fullCommunityUsers', fullCommunityUsers);
+
     let serviceUser = null;
     if (service.user?.id) {
       serviceUser = await this.usersRepository.findOne({
