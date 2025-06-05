@@ -434,8 +434,6 @@ export class ServicesService {
       })
       : [];
 
-    console.log('fullCommunityUsers', fullCommunityUsers);
-
     let serviceUser = null;
     if (service.user?.id) {
       serviceUser = await this.usersRepository.findOne({
@@ -444,19 +442,31 @@ export class ServicesService {
       });
     }
 
+    // Separar usuarios con token y usuarios con teléfono
     const allUsers = [
       ...(serviceUser ? [serviceUser] : []),
       ...superAdmins,
       ...fullCommunityUsers,
-    ].filter(
-      (user, index, self) =>
-        user?.token &&
+    ];
+
+    // Usuarios con token válido para push notifications
+    const usersWithToken = allUsers
+      .filter(user => user?.token && user.token.trim() !== '')
+      .filter((user, index, self) => 
         self.findIndex(u => u.token === user.token) === index
-    );
+      );
 
-    console.log('allUsers', allUsers);
+    // Usuarios con número de teléfono para SMS
+    const usersWithPhone = allUsers
+      .filter(user => user?.phoneNumber && user.phoneNumber.trim() !== '')
+      .filter((user, index, self) => 
+        self.findIndex(u => u.phoneNumber === user.phoneNumber) === index
+      );
 
-    const uniqueTokens = allUsers.map(u => u.token);
+    console.log('Users with token:', usersWithToken.map(u => ({ id: u.id, name: u.name, token: u.token })));
+    console.log('Users with phone:', usersWithPhone.map(u => ({ id: u.id, name: u.name, phone: u.phoneNumber })));
+
+    const uniqueTokens = usersWithToken.map(u => u.token);
 
     return this.pushNotificationService.sendNotification({
       body: notification.body,
@@ -465,7 +475,7 @@ export class ServicesService {
       sound: 'default',
       tokensNotification: {
         tokens: uniqueTokens,
-        users: allUsers,
+        users: usersWithPhone, // Enviamos todos los usuarios con teléfono para SMS
       },
     });
   }
