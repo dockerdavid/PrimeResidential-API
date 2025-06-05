@@ -102,7 +102,7 @@ export class ReportsService {
     const totalFelixSonSum = servicesDashboard.reduce((acc, service) => acc + (service.total * this.felixSonComission), 0);
 
     const tableBody = [
-      ['Date', 'Community', 'Unit number', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Hugo', 'Felix', 'Felix hijo', 'Cleaner'],
+      ['Date', 'Community', 'Unit number', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Cleaner'],
       ...servicesDashboard.map(service => [
         moment(service.date).format('MM/DD/YYYY'),
         service.community.communityName,
@@ -112,9 +112,6 @@ export class ReportsService {
         formatCurrency(service.extrasByServices.reduce((acc, extraByService) => acc + Number(extraByService.extra.itemPrice), 0)),
         formatCurrency(service.extrasByServices.reduce((acc, extraByService) => acc + Number(extraByService.extra.commission), 0)),
         formatCurrency(Number(service.totalCleaner)),
-        formatCurrency(Number(service.total * this.hugoComission)),
-        formatCurrency(Number(service.total * this.felixComission)),
-        formatCurrency(Number(service.total * this.felixSonComission)),
         service.user?.name || 'N/A',
       ]),
       ['', '', 'Total',
@@ -123,10 +120,26 @@ export class ReportsService {
         formatCurrency(totalExtrasPrice),
         formatCurrency(totalExtrasCommission),
         formatCurrency(totalCleanerSum),
+        '']
+    ];
+
+    // Nueva tabla de comisiones
+    const comisionesTableBody = [
+      ['Date', 'Community', 'Unit number', 'Total Service', 'Hugo (20%)', 'Felix (60%)', 'Felix hijo (20%)'],
+      ...servicesDashboard.map(service => [
+        moment(service.date).format('MM/DD/YYYY'),
+        service.community.communityName,
+        service.unitNumber,
+        formatCurrency(service.total),
+        formatCurrency(Number(service.total * this.hugoComission)),
+        formatCurrency(Number(service.total * this.felixComission)),
+        formatCurrency(Number(service.total * this.felixSonComission)),
+      ]),
+      ['', '', 'Total',
+        formatCurrency(servicesDashboard.reduce((acc, service) => acc + service.total, 0)),
         formatCurrency(totalHugoSum),
         formatCurrency(totalFelixSum),
-        formatCurrency(totalFelixSonSum),
-        '']
+        formatCurrency(totalFelixSonSum)]
     ];
 
     // ---------- Sección de la tabla de Costos ----------
@@ -164,7 +177,7 @@ export class ReportsService {
       ['', 'Total', `$${costs.reduce((sum, cost) => sum + Number(cost.amount), 0).toFixed(2)}`]
     ];
 
-    // Integrar ambos reportes en un solo PDF
+    // Integrar todos los reportes en un solo PDF
     const docDefinition: TDocumentDefinitions = {
       styles,
       pageMargins: [40, 120, 40, 60],
@@ -196,8 +209,21 @@ export class ReportsService {
           layout: 'customLayout01',
           table: {
             headerRows: 1,
-            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: tableBody
+          }
+        },
+        {
+          text: 'Comisiones Report',
+          style: 'subheader',
+          margin: [0, 20, 0, 10],
+        },
+        {
+          layout: 'customLayout01',
+          table: {
+            headerRows: 1,
+            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            body: comisionesTableBody
           }
         },
         {
