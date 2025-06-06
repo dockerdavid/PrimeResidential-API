@@ -57,6 +57,11 @@ const customTableLayouts: Record<string, CustomTableLayout> = {
         },
         fillColor: function (i, node) {
             const rowData = node.table.body[i];
+            // Debug info
+            if (rowData && Array.isArray(rowData) && rowData.length > 2) {
+                console.log('Row:', i, 'Unit number:', rowData[2]);
+            }
+            
             // Si es el encabezado
             if (i === 0) {
                 return '#7b90be';
@@ -67,9 +72,8 @@ const customTableLayouts: Record<string, CustomTableLayout> = {
             }
             // Si el unit number es "Leasing center"
             if (rowData && Array.isArray(rowData) && rowData.length > 2) {
-                const unitNumber = String(rowData[2]).trim().toLowerCase();
-                if (unitNumber === 'leasing center') {
-                    return '#ff6666'; // Rojo más intenso
+                if (rowData[2] && rowData[2].toString() === 'Leasing center') {
+                    return {fillColor: '#ff0000', color: '#ffffff'}; // Rojo con texto blanco
                 }
             }
             // Patrón zebra para las demás filas
