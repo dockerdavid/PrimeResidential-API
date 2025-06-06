@@ -55,30 +55,25 @@ const customTableLayouts: Record<string, CustomTableLayout> = {
         paddingRight: function (i, node) {
             return i === node.table.widths.length - 1 ? 0 : 8;
         },
-        fillColor: function (i, node) {
-            const rowData = node.table.body[i];
-            // Debug info
-            if (rowData && Array.isArray(rowData) && rowData.length > 2) {
-                console.log('Row:', i, 'Unit number:', rowData[2]);
-            }
-            
+        fillColor: function (rowIndex, node, columnIndex) {
             // Si es el encabezado
-            if (i === 0) {
+            if (rowIndex === 0) {
                 return '#7b90be';
             }
             // Si es la última fila (totales)
-            if (i === node.table.body.length - 1) {
+            if (rowIndex === node.table.body.length - 1) {
                 return '#acb3c1';
             }
-            // Si el unit number es "Leasing center"
-            if (rowData && Array.isArray(rowData) && rowData.length > 2) {
-                if (rowData[2] && rowData[2].toString() === 'Leasing center') {
-                    return '#ff0000'; // Rojo puro
-                }
+            
+            // Obtener el contenido de la celda de Unit number (columna 2)
+            const row = node.table.body[rowIndex];
+            if (row && Array.isArray(row) && row[2] === 'Leasing center') {
+                return '#ff0000';
             }
+            
             // Patrón zebra para las demás filas
-            return i % 2 === 0 ? '#f3f3f3' : null;
-        },
+            return rowIndex % 2 === 0 ? '#f3f3f3' : null;
+        }
     },
 };
 
