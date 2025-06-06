@@ -73,7 +73,7 @@ const customTableLayouts: Record<string, CustomTableLayout> = {
             // Si el unit number es "Leasing center"
             if (rowData && Array.isArray(rowData) && rowData.length > 2) {
                 if (rowData[2] && rowData[2].toString() === 'Leasing center') {
-                    return {fillColor: '#ff0000', color: '#ffffff'}; // Rojo con texto blanco
+                    return '#ff0000'; // Rojo puro
                 }
             }
             // Patrón zebra para las demás filas
