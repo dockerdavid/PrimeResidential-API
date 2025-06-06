@@ -69,12 +69,16 @@ export class ReportsService {
     const services = await queryBuilder.getMany();
 
     const servicesDashboard = services.map(service => {
-      const totalExtrasByService = service.extrasByServices.reduce((acc, extraByService) => {
-        return acc + Number(extraByService.extra.commission);
-      }, 0);
+      const totalExtrasByService = service.extrasByServices?.reduce((acc, extraByService) => {
+        const commission = extraByService?.extra?.commission ?? 0;
+        return acc + Number(commission);
+      }, 0) ?? 0;
 
-      const totalCleaner = Number(totalExtrasByService) + Number(service.type.commission);
-      const totalNotAdjusted = Number(service.type.price) - Number(service.type.commission) - Number(totalExtrasByService);
+      const typeCommission = service.type?.commission ?? 0;
+      const typePrice = service.type?.price ?? 0;
+
+      const totalCleaner = Number(totalExtrasByService) + Number(typeCommission);
+      const totalNotAdjusted = Number(typePrice) - Number(typeCommission) - Number(totalExtrasByService);
 
       const totalParner = totalNotAdjusted * 0.4;
       const total = totalNotAdjusted * 0.6;
@@ -90,29 +94,29 @@ export class ReportsService {
     const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 
     // Totales
-    const totalServicePrice = servicesDashboard.reduce((acc, service) => acc + Number(service.type.price), 0);
-    const totalServiceCommission = servicesDashboard.reduce((acc, service) => acc + Number(service.type.commission), 0);
+    const totalServicePrice = servicesDashboard.reduce((acc, service) => acc + Number(service.type?.price ?? 0), 0);
+    const totalServiceCommission = servicesDashboard.reduce((acc, service) => acc + Number(service.type?.commission ?? 0), 0);
     const totalExtrasPrice = servicesDashboard.reduce((acc, service) =>
-      acc + service.extrasByServices.reduce((sum, extraByService) => sum + Number(extraByService.extra.itemPrice), 0), 0);
+      acc + (service.extrasByServices?.reduce((sum, extraByService) => sum + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0), 0);
     const totalExtrasCommission = servicesDashboard.reduce((acc, service) =>
-      acc + service.extrasByServices.reduce((sum, extraByService) => sum + Number(extraByService.extra.commission), 0), 0);
-    const totalCleanerSum = servicesDashboard.reduce((acc, service) => acc + service.totalCleaner, 0);
-    const totalHugoSum = servicesDashboard.reduce((acc, service) => acc + (service.total * this.hugoComission), 0);
-    const totalFelixSum = servicesDashboard.reduce((acc, service) => acc + (service.total * this.felixComission), 0);
-    const totalFelixSonSum = servicesDashboard.reduce((acc, service) => acc + (service.total * this.felixSonComission), 0);
+      acc + (service.extrasByServices?.reduce((sum, extraByService) => sum + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0), 0);
+    const totalCleanerSum = servicesDashboard.reduce((acc, service) => acc + (service.totalCleaner ?? 0), 0);
+    const totalHugoSum = servicesDashboard.reduce((acc, service) => acc + ((service.total ?? 0) * this.hugoComission), 0);
+    const totalFelixSum = servicesDashboard.reduce((acc, service) => acc + ((service.total ?? 0) * this.felixComission), 0);
+    const totalFelixSonSum = servicesDashboard.reduce((acc, service) => acc + ((service.total ?? 0) * this.felixSonComission), 0);
 
     const tableBody = [
       ['Date', 'Community', 'Unit number', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Cleaner'],
       ...servicesDashboard.map(service => [
         moment(service.date).format('MM/DD/YYYY'),
-        service.community.communityName,
-        service.unitNumber,
-        formatCurrency(Number(service.type.price)),
-        formatCurrency(Number(service.type.commission)),
-        formatCurrency(service.extrasByServices.reduce((acc, extraByService) => acc + Number(extraByService.extra.itemPrice), 0)),
-        formatCurrency(service.extrasByServices.reduce((acc, extraByService) => acc + Number(extraByService.extra.commission), 0)),
-        formatCurrency(Number(service.totalCleaner)),
-        service.user?.name || 'N/A',
+        service.community?.communityName ?? 'N/A',
+        service.unitNumber ?? 'N/A',
+        formatCurrency(Number(service.type?.price ?? 0)),
+        formatCurrency(Number(service.type?.commission ?? 0)),
+        formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0),
+        formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0),
+        formatCurrency(Number(service.totalCleaner ?? 0)),
+        service.user?.name ?? 'N/A',
       ]),
       ['', '', 'Total',
         formatCurrency(totalServicePrice),
@@ -307,12 +311,16 @@ export class ReportsService {
 
     cleanersMap.forEach((services, cleanerName) => {
       const servicesDashboard = services.map(service => {
-        const totalExtrasByService = service.extrasByServices.reduce((acc, extraByService) => {
-          return acc + Number(extraByService.extra.commission);
-        }, 0);
+        const totalExtrasByService = service.extrasByServices?.reduce((acc, extraByService) => {
+          const commission = extraByService?.extra?.commission ?? 0;
+          return acc + Number(commission);
+        }, 0) ?? 0;
 
-        const totalCleaner = Number(totalExtrasByService) + Number(service.type.commission);
-        const totalNotAdjusted = Number(service.type.price) - Number(service.type.commission) - Number(totalExtrasByService);
+        const typeCommission = service.type?.commission ?? 0;
+        const typePrice = service.type?.price ?? 0;
+
+        const totalCleaner = Number(totalExtrasByService) + Number(typeCommission);
+        const totalNotAdjusted = Number(typePrice) - Number(typeCommission) - Number(totalExtrasByService);
 
         const totalParner = totalNotAdjusted * 0.4;
         const total = totalNotAdjusted * 0.6;
@@ -329,12 +337,12 @@ export class ReportsService {
         ['Date', 'Community', 'Unit number', 'Type', 'Commission', 'Extras', 'Total'],
         ...servicesDashboard.map(service => [
           moment(service.date).format('MM/DD/YYYY'),
-          service.community.communityName,
-          service.unitNumber,
+          service.community?.communityName ?? 'N/A',
+          service.unitNumber ?? 'N/A',
           'Total:',
-          formatCurrency(Number(service.type.commission)),
-          formatCurrency(service.extrasByServices.reduce((acc, extraByService) => acc + Number(extraByService.extra.commission), 0)),
-          formatCurrency(Number(service.totalCleaner)),
+          formatCurrency(Number(service.type?.commission ?? 0)),
+          formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0),
+          formatCurrency(Number(service.totalCleaner ?? 0)),
         ]),
       ];
 
