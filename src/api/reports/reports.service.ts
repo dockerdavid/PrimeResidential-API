@@ -251,12 +251,12 @@ export class ReportsService {
       styles,
       pageMargins: [40, 120, 40, 60],
       pageOrientation: 'landscape',
-      pageSize: 'C3',
+      pageSize: 'LETTER',
       header: {
         columns: [
           logo,
           {
-            text: `General report week ${moment(startOfWeek).format('MM/DD/YYYY')} to ${moment(endOfWeek).format('MM/DD/YYYY')}`,
+            text: `Service Report - Week ${moment(startOfWeek).format('MM/DD/YYYY')} to ${moment(endOfWeek).format('MM/DD/YYYY')}`,
             style: 'header',
           },
           {
@@ -317,7 +317,7 @@ export class ReportsService {
 
     const doc = this.printerService.createPDF(docDefinition);
 
-    doc.info.Title = `General Report ${startOfWeek} - ${endOfWeek}`;
+    doc.info.Title = `Service Report ${startOfWeek} - ${endOfWeek}`;
 
     return doc;
   }
