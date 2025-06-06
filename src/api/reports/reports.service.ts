@@ -149,25 +149,37 @@ export class ReportsService {
     const totalFelixSonSum = servicesDashboard.reduce((acc, service) => acc + ((service.total ?? 0) * this.felixSonComission), 0);
 
     const tableBody = [
-      ['Date', 'Community', 'Unit number', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Cleaner'],
-      ...servicesDashboard.map(service => [
-        moment(service.date).format('MM/DD/YYYY'),
-        service.community?.communityName ?? 'N/A',
-        service.unitNumber ?? 'N/A',
-        formatCurrency(Number(service.type?.price ?? 0)),
-        formatCurrency(Number(service.type?.commission ?? 0)),
-        formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0),
-        formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0),
-        formatCurrency(Number(service.totalCleaner ?? 0)),
-        service.user?.name ?? 'N/A',
-      ]),
+      ['Date', 'Community', 'Unit number', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Cleaner'].map(header => ({
+        text: header,
+        fillColor: '#7b90be'
+      })),
+      ...servicesDashboard.map(service => {
+        const isLeasingCenter = service.unitNumber === 'Leasing center';
+        const rowColor = isLeasingCenter ? '#ff0000' : null;
+        
+        return [
+          { text: moment(service.date).format('MM/DD/YYYY'), fillColor: rowColor },
+          { text: service.community?.communityName ?? 'N/A', fillColor: rowColor },
+          { text: service.unitNumber ?? 'N/A', fillColor: rowColor },
+          { text: formatCurrency(Number(service.type?.price ?? 0)), fillColor: rowColor },
+          { text: formatCurrency(Number(service.type?.commission ?? 0)), fillColor: rowColor },
+          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0), fillColor: rowColor },
+          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0), fillColor: rowColor },
+          { text: formatCurrency(Number(service.totalCleaner ?? 0)), fillColor: rowColor },
+          { text: service.user?.name ?? 'N/A', fillColor: rowColor }
+        ];
+      }),
       ['', '', 'Total',
         formatCurrency(totalServicePrice),
         formatCurrency(totalServiceCommission),
         formatCurrency(totalExtrasPrice),
         formatCurrency(totalExtrasCommission),
         formatCurrency(totalCleanerSum),
-        '']
+        ''
+      ].map(cell => ({
+        text: cell,
+        fillColor: '#acb3c1'
+      }))
     ];
 
     // ---------- Sección de la tabla de Costos ----------
@@ -270,7 +282,6 @@ export class ReportsService {
           margin: [0, 10, 0, 10],
         },
         {
-          layout: 'customLayout01',
           table: {
             headerRows: 1,
             widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
