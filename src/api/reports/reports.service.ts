@@ -123,18 +123,7 @@ export class ReportsService {
         '']
     ];
 
-    // Nueva tabla de comisiones
     const comisionesTableBody = [
-      ['Date', 'Community', 'Unit number', 'Total Service', 'Hugo (20%)', 'Felix (60%)', 'Felix hijo (20%)'],
-      ...servicesDashboard.map(service => [
-        moment(service.date).format('MM/DD/YYYY'),
-        service.community.communityName,
-        service.unitNumber,
-        formatCurrency(service.total),
-        formatCurrency(Number(service.total * this.hugoComission)),
-        formatCurrency(Number(service.total * this.felixComission)),
-        formatCurrency(Number(service.total * this.felixSonComission)),
-      ]),
       ['', '', 'Total',
         formatCurrency(servicesDashboard.reduce((acc, service) => acc + service.total, 0)),
         formatCurrency(totalHugoSum),
@@ -166,6 +155,41 @@ export class ReportsService {
       })),
       ...costsVariables,
     );
+
+    const totalCosts = costs.reduce((sum, cost) => sum + Number(cost.amount), 0);
+    const costPerShareholder = totalCosts / 3; // 33% para cada accionista
+
+    // Nueva tabla de comisiones con costos
+    const comisionesTableBody = [
+      ['Date', 'Community', 'Unit number', 'Total Service', 'Hugo (20%)', 'Felix (60%)', 'Felix hijo (20%)', 'Costos (33% c/u)', 'Ganancia Neta'],
+      ...servicesDashboard.map(service => [
+        moment(service.date).format('MM/DD/YYYY'),
+        service.community.communityName,
+        service.unitNumber,
+        formatCurrency(service.total),
+        formatCurrency(Number(service.total * this.hugoComission)),
+        formatCurrency(Number(service.total * this.felixComission)),
+        formatCurrency(Number(service.total * this.felixSonComission)),
+        formatCurrency(costPerShareholder),
+        formatCurrency(Number(service.total) - costPerShareholder),
+      ]),
+      ['', '', 'Total',
+        formatCurrency(servicesDashboard.reduce((acc, service) => acc + service.total, 0)),
+        formatCurrency(totalHugoSum),
+        formatCurrency(totalFelixSum),
+        formatCurrency(totalFelixSonSum),
+        formatCurrency(costPerShareholder),
+        formatCurrency(servicesDashboard.reduce((acc, service) => acc + service.total, 0) - totalCosts)
+      ],
+      ['', '', 'Ganancia Neta',
+        '',
+        formatCurrency(totalHugoSum - costPerShareholder),
+        formatCurrency(totalFelixSum - costPerShareholder),
+        formatCurrency(totalFelixSonSum - costPerShareholder),
+        formatCurrency(totalCosts),
+        ''
+      ]
+    ];
 
     const costosTableBody = [
       ['Date', 'Description', 'Amount'],
