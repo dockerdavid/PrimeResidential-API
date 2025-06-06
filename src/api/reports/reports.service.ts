@@ -57,6 +57,7 @@ const customTableLayouts: Record<string, CustomTableLayout> = {
         },
         fillColor: function (i, node) {
             const rowData = node.table.body[i];
+            // Si es el encabezado
             if (i === 0) {
                 return '#7b90be';
             }
@@ -64,10 +65,14 @@ const customTableLayouts: Record<string, CustomTableLayout> = {
             if (i === node.table.body.length - 1) {
                 return '#acb3c1';
             }
-            // Si el unit number (tercera columna) es "Leasing center" (insensible a mayúsculas/minúsculas)
-            if (rowData && typeof rowData[2] === 'string' && rowData[2].toLowerCase().includes('leasing center')) {
-                return '#ff9999'; // Un rojo más visible
+            // Si el unit number es "Leasing center"
+            if (rowData && Array.isArray(rowData) && rowData.length > 2) {
+                const unitNumber = String(rowData[2]).trim().toLowerCase();
+                if (unitNumber === 'leasing center') {
+                    return '#ff6666'; // Rojo más intenso
+                }
             }
+            // Patrón zebra para las demás filas
             return i % 2 === 0 ? '#f3f3f3' : null;
         },
     },
