@@ -153,33 +153,34 @@ export class ReportsService {
 
     // Nueva tabla de comisiones con costos
     const comisionesTableBody = [
-      ['Date', 'Community', 'Unit number', 'Total Service', 'Hugo (20%)', 'Felix (60%)', 'Felix hijo (20%)', 'Costos (33% c/u)', 'Ganancia Neta'],
-      ...servicesDashboard.map(service => [
-        moment(service.date).format('MM/DD/YYYY'),
-        service.community.communityName,
-        service.unitNumber,
-        formatCurrency(service.total),
-        formatCurrency(Number(service.total * this.hugoComission)),
-        formatCurrency(Number(service.total * this.felixComission)),
-        formatCurrency(Number(service.total * this.felixSonComission)),
-        formatCurrency(costPerShareholder),
-        formatCurrency(Number(service.total) - costPerShareholder),
-      ]),
-      ['', '', 'Total',
-        formatCurrency(servicesDashboard.reduce((acc, service) => acc + service.total, 0)),
+      ['Accionista', 'Porcentaje', 'Ganancia Bruta', 'Costos (33%)', 'Ganancia Neta'],
+      [
+        'Hugo',
+        '20%',
         formatCurrency(totalHugoSum),
+        formatCurrency(costPerShareholder),
+        formatCurrency(totalHugoSum - costPerShareholder)
+      ],
+      [
+        'Felix',
+        '60%',
         formatCurrency(totalFelixSum),
+        formatCurrency(costPerShareholder),
+        formatCurrency(totalFelixSum - costPerShareholder)
+      ],
+      [
+        'Felix hijo',
+        '20%',
         formatCurrency(totalFelixSonSum),
         formatCurrency(costPerShareholder),
-        formatCurrency(servicesDashboard.reduce((acc, service) => acc + service.total, 0) - totalCosts)
+        formatCurrency(totalFelixSonSum - costPerShareholder)
       ],
-      ['', '', 'Ganancia Neta',
-        '',
-        formatCurrency(totalHugoSum - costPerShareholder),
-        formatCurrency(totalFelixSum - costPerShareholder),
-        formatCurrency(totalFelixSonSum - costPerShareholder),
+      [
+        'Total',
+        '100%',
+        formatCurrency(totalHugoSum + totalFelixSum + totalFelixSonSum),
         formatCurrency(totalCosts),
-        ''
+        formatCurrency((totalHugoSum + totalFelixSum + totalFelixSonSum) - totalCosts)
       ]
     ];
 
@@ -230,7 +231,7 @@ export class ReportsService {
           }
         },
         {
-          text: 'Comisiones Report',
+          text: 'Reporte de Comisiones por Accionista',
           style: 'subheader',
           margin: [0, 20, 0, 10],
         },
@@ -238,7 +239,7 @@ export class ReportsService {
           layout: 'customLayout01',
           table: {
             headerRows: 1,
-            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
             body: comisionesTableBody
           }
         },
