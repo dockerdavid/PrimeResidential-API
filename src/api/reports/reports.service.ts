@@ -151,22 +151,23 @@ export class ReportsService {
     const tableBody = [
       ['Date', 'Community', 'Unit number', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Cleaner'].map(header => ({
         text: header,
-        fillColor: '#7b90be'
+        fillColor: '#7b90be',
+        color: '#ffffff'
       })),
       ...servicesDashboard.map(service => {
         const isLeasingCenter = service.unitNumber === 'Leasing center';
-        const rowColor = isLeasingCenter ? '#ff0000' : null;
+        const textColor = isLeasingCenter ? '#ff0000' : null;
         
         return [
-          { text: moment(service.date).format('MM/DD/YYYY'), fillColor: rowColor },
-          { text: service.community?.communityName ?? 'N/A', fillColor: rowColor },
-          { text: service.unitNumber ?? 'N/A', fillColor: rowColor },
-          { text: formatCurrency(Number(service.type?.price ?? 0)), fillColor: rowColor },
-          { text: formatCurrency(Number(service.type?.commission ?? 0)), fillColor: rowColor },
-          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0), fillColor: rowColor },
-          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0), fillColor: rowColor },
-          { text: formatCurrency(Number(service.totalCleaner ?? 0)), fillColor: rowColor },
-          { text: service.user?.name ?? 'N/A', fillColor: rowColor }
+          { text: moment(service.date).format('MM/DD/YYYY'), color: textColor },
+          { text: service.community?.communityName ?? 'N/A', color: textColor },
+          { text: service.unitNumber ?? 'N/A', color: textColor },
+          { text: formatCurrency(Number(service.type?.price ?? 0)), color: textColor },
+          { text: formatCurrency(Number(service.type?.commission ?? 0)), color: textColor },
+          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0), color: textColor },
+          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0), color: textColor },
+          { text: formatCurrency(Number(service.totalCleaner ?? 0)), color: textColor },
+          { text: service.user?.name ?? 'N/A', color: textColor }
         ];
       }),
       ['', '', 'Total',
@@ -258,7 +259,7 @@ export class ReportsService {
       styles,
       pageMargins: [40, 120, 40, 60],
       pageOrientation: 'landscape',
-      pageSize: 'LETTER',
+      pageSize: 'C3',
       header: {
         columns: [
           logo,
