@@ -123,14 +123,6 @@ export class ReportsService {
         '']
     ];
 
-    const comisionesTableBody = [
-      ['', '', 'Total',
-        formatCurrency(servicesDashboard.reduce((acc, service) => acc + service.total, 0)),
-        formatCurrency(totalHugoSum),
-        formatCurrency(totalFelixSum),
-        formatCurrency(totalFelixSonSum)]
-    ];
-
     // ---------- Sección de la tabla de Costos ----------
     const costs = [];
 
