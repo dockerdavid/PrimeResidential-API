@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import moment from 'moment';
-import type { Content, StyleDictionary, TDocumentDefinitions } from 'pdfmake/interfaces';
+import type { Content, StyleDictionary, TDocumentDefinitions, BufferOptions, CustomTableLayout } from 'pdfmake/interfaces';
 import { CostsEntity } from '../../entities/costs.entity';
 import { Between, Repository } from 'typeorm';
 import { ServicesEntity } from '../../entities/services.entity';
 import { ExtrasByServiceEntity } from '../../entities/extras_by_service.entity';
 import { PrinterService } from '../../printer/printer.service';
+const PdfPrinter = require('pdfmake');
 
 const styles: StyleDictionary = {
   header: {
@@ -33,6 +34,44 @@ const logo: Content = {
   width: 150,
   alignment: 'center',
 }
+
+const customTableLayouts: Record<string, CustomTableLayout> = {
+    customLayout01: {
+        hLineWidth: function (i, node) {
+            if (i === 0 || i === node.table.body.length) {
+                return 0;
+            }
+            return i === node.table.headerRows ? 2 : 1;
+        },
+        vLineWidth: function (i) {
+            return 0;
+        },
+        hLineColor: function (i) {
+            return i === 1 ? 'black' : '#bbbbbb';
+        },
+        paddingLeft: function (i) {
+            return i === 0 ? 0 : 8;
+        },
+        paddingRight: function (i, node) {
+            return i === node.table.widths.length - 1 ? 0 : 8;
+        },
+        fillColor: function (i, node) {
+            const rowData = node.table.body[i];
+            if (i === 0) {
+                return '#7b90be';
+            }
+            // Si es la última fila (totales)
+            if (i === node.table.body.length - 1) {
+                return '#acb3c1';
+            }
+            // Si el unit number (tercera columna) es "Leasing center"
+            if (rowData && rowData[2] === 'Leasing center') {
+                return '#ffcccc'; // Un rojo claro
+            }
+            return i % 2 === 0 ? '#f3f3f3' : null;
+        },
+    },
+};
 
 @Injectable()
 export class ReportsService {
