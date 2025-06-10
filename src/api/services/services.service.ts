@@ -274,7 +274,13 @@ export class ServicesService {
 
   async create(createServiceDto: CreateServiceDto) {
     const { extraId, ...createServiceDtoCopy } = createServiceDto;
-    console.log(createServiceDtoCopy);
+    
+    // Log detallado del DTO
+    console.log('=== Create Service DTO Details ===');
+    console.log('Full DTO:', JSON.stringify(createServiceDto, null, 2));
+    console.log('ExtraId:', extraId);
+    console.log('DTO without extraId:', JSON.stringify(createServiceDtoCopy, null, 2));
+    console.log('===============================');
 
     const service = this.servicesRepository.create(createServiceDtoCopy);
     await this.servicesRepository.save(service);
