@@ -303,19 +303,42 @@ export class ServicesService {
       where: { id: createServiceDto.userId }
     });
 
-    // Obtener usuarios con token y teléfono
-    const usersWithToken = await this.usersRepository.find({
-      where: { token: Not(IsNull()) }
+    // Obtener super admins
+    const superAdmins = await this.usersRepository.find({
+      where: { roleId: '1' },
+      select: ['id', 'token', 'phoneNumber', 'name'],
     });
 
-    const usersWithPhone = await this.usersRepository.find({
-      where: { phoneNumber: Not(IsNull()) }
+    // Obtener manager y supervisor de la comunidad
+    const community = await this.communitiesRepository.findOne({
+      where: { id: service.communityId },
+      relations: ['supervisorUser', 'managerUser'],
     });
 
-    // Agregar el usuario creador a la lista si tiene teléfono
-    if (creatingUser?.phoneNumber) {
-      usersWithPhone.push(creatingUser);
-    }
+    const communityUsers = [
+      community?.supervisorUser,
+      community?.managerUser
+    ].filter(Boolean);
+
+    // Combinar todos los usuarios que deben recibir notificación
+    const allUsers = [
+      creatingUser,
+      ...superAdmins,
+      ...communityUsers
+    ].filter(Boolean);
+
+    // Separar usuarios con token y teléfono
+    const usersWithToken = allUsers
+      .filter(user => user?.token && user.token.trim() !== '')
+      .filter((user, index, self) => 
+        self.findIndex(u => u.token === user.token) === index
+      );
+
+    const usersWithPhone = allUsers
+      .filter(user => user?.phoneNumber && user.phoneNumber.trim() !== '')
+      .filter((user, index, self) => 
+        self.findIndex(u => u.phoneNumber === user.phoneNumber) === index
+      );
 
     console.log('Users with token:', usersWithToken);
     console.log('Users with phone:', usersWithPhone);

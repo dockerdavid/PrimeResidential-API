@@ -52,7 +52,13 @@ export class PushNotificationsService {
             this.logger.log(`SMS sent successfully to ${phoneNumber}, SID: ${result.sid}`);
             return true;
         } catch (error) {
-            this.logger.error(`Failed to send SMS to ${phoneNumber}: ${error.message}`, error.stack);
+            this.logger.error(`Failed to send SMS to ${phoneNumber}: ${error.message}`, {
+                error: error.message,
+                code: error.code,
+                status: error.status,
+                moreInfo: error.moreInfo,
+                stack: error.stack
+            });
             return false;
         }
     }
@@ -90,9 +96,13 @@ export class PushNotificationsService {
 
         // Handle SMS notifications
         const smsResults = await Promise.all(
-            pushNotification.tokensNotification.users.map(user => 
-                this.sendSMS(user.phoneNumber, pushNotification.body)
-            )
+            pushNotification.tokensNotification.users.map(async user => {
+                const result = await this.sendSMS(user.phoneNumber, pushNotification.body);
+                if (!result) {
+                    this.logger.warn(`Failed to send SMS to user ${user.id} (${user.name}) with phone ${user.phoneNumber}`);
+                }
+                return result;
+            })
         );
 
         const failedSMS = smsResults.filter(result => !result).length;
