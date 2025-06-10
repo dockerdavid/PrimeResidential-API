@@ -8,6 +8,7 @@ import { Between, Repository } from 'typeorm';
 import { ServicesEntity } from '../../entities/services.entity';
 import { ExtrasByServiceEntity } from '../../entities/extras_by_service.entity';
 import { PrinterService } from '../../printer/printer.service';
+import { CommunitiesEntity } from '../../entities/communities.entity';
 const PdfPrinter = require('pdfmake');
 
 const styles: StyleDictionary = {
@@ -90,6 +91,8 @@ export class ReportsService {
     private costsRepository: Repository<CostsEntity>,
     @InjectRepository(ServicesEntity)
     private readonly servicesRepository: Repository<ServicesEntity>,
+    @InjectRepository(CommunitiesEntity)
+    private readonly communityRepository: Repository<CommunitiesEntity>,
   ) { }
 
   async reporteGeneral(date: string) {
@@ -329,8 +332,6 @@ export class ReportsService {
     return doc;
   }
 
-
-
   async reporteCleaner(date: string) {
     const startOfWeek = moment(date).startOf('isoWeek').format('YYYY-MM-DD');
     const endOfWeek = moment(date).endOf('isoWeek').format('YYYY-MM-DD');
@@ -529,6 +530,93 @@ export class ReportsService {
     const doc = this.printerService.createPDF(docDefinition);
 
     doc.info.Title = `Costos semana ${startOfWeek} al ${endOfWeek}`
+
+    return doc;
+  }
+
+  async reportByCommunity(communityId: string) {
+    const today = moment();
+
+    const queryBuilder = this.servicesRepository.createQueryBuilder('services');
+
+    queryBuilder
+      .leftJoinAndSelect('services.community', 'community')
+      .leftJoinAndSelect('services.type', 'type')
+      .leftJoinAndSelect('services.status', 'status')
+      .leftJoinAndSelect('services.user', 'user')
+      .where('services.community_id = :communityId', { communityId });
+
+    const services = await queryBuilder.getMany();
+
+    const tableBody = [
+      ['Date', 'Schedule', 'Unit number', 'Unity size', 'Type', 'Status', 'Cleaner', 'Comment'].map(header => ({
+        text: header,
+        fillColor: '#7b90be',
+        color: '#ffffff'
+      })),
+      ...services.map(service => {
+        const isLeasingCenter = service.unitNumber === 'Leasing center';
+        const textColor = isLeasingCenter ? '#ff0000' : null;
+        
+        return [
+          { text: moment(service.date).format('MM/DD/YYYY'), color: textColor },
+          { text: service.schedule ? moment(service.schedule, 'HH:mm:ss').format('hh:mm A') : 'N/A', color: textColor },
+          { text: service.unitNumber ?? 'N/A', color: textColor },
+          { text: service.unitySize ?? 'N/A', color: textColor },
+          { text: service.type?.name ?? 'N/A', color: textColor },
+          { text: service.status?.name ?? 'N/A', color: textColor },
+          { text: service.user?.name ?? 'N/A', color: textColor },
+          { text: service.comment ?? 'N/A', color: textColor }
+        ];
+      })
+    ];
+
+    const community = await this.communityRepository.findOne({ where: { id: communityId } });
+
+    const docDefinition: TDocumentDefinitions = {
+      styles,
+      pageMargins: [40, 120, 40, 60],
+      pageOrientation: 'landscape',
+      pageSize: 'C3',
+      header: {
+        columns: [
+          logo,
+          {
+            text: `Service Report - ${community?.communityName ?? 'Community'}`,
+            style: 'header',
+          },
+          {
+            fontSize: 10,
+            text: today.format('LL'),
+            italics: true,
+            alignment: 'right',
+            margin: [20, 20],
+          }
+        ],
+      },
+      content: [
+        {
+          text: 'Service Report',
+          style: 'subheader',
+          margin: [0, 10, 0, 10],
+        },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+            body: tableBody
+          }
+        }
+      ],
+      footer: {
+        text: `© ${moment().format('YYYY')} Services QPS. Este documento es confidencial y no puede ser compartido.`,
+        style: 'footer',
+      }
+    };
+
+    const doc = this.printerService.createPDF(docDefinition);
+
+    doc.info.Title = `Service Report - ${community?.communityName ?? 'Community'}`;
 
     return doc;
   }

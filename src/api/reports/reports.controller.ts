@@ -31,4 +31,12 @@ export class ReportsController {
     pdfDoc.pipe(response);
     pdfDoc.end();
   }
+
+  @Get('/community/:communityId')
+  async reportByCommunity(@Res() response: Response, @Param('communityId') communityId: string) {
+    const pdfDoc = await this.reportsService.reportByCommunity(communityId);
+    response.setHeader('Content-Type', 'application/pdf');
+    pdfDoc.pipe(response);
+    pdfDoc.end();
+  }
 }
