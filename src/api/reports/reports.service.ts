@@ -288,7 +288,7 @@ export class ReportsService {
         {
           table: {
             headerRows: 1,
-            widths: ['10%', '10%', '10%', '10%', '15%', '12%', '12%', '12%', '9%'],
+            widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*'],
             body: tableBody
           }
         },
@@ -413,7 +413,7 @@ export class ReportsService {
           layout: 'customLayout01',
           table: {
             headerRows: 1,
-            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['*', '*', '*', '*', '*', '*', '*'],
             body: tableBody,
           },
         }
@@ -508,7 +508,7 @@ export class ReportsService {
           layout: 'customLayout01',
           table: {
             headerRows: 1,
-            widths: ['auto', '*', 'auto'],
+            widths: ['*', '*', '*'],
             body: [
               ['Date', 'Description', 'Amount'],
               ...costs.map(cost => [
@@ -628,7 +628,7 @@ export class ReportsService {
         {
           table: {
             headerRows: 1,
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*'],
             body: tableBody
           }
         }
