@@ -542,14 +542,17 @@ export class ReportsService {
     queryBuilder
       .leftJoinAndSelect('services.community', 'community')
       .leftJoinAndSelect('services.type', 'type')
-      .leftJoinAndSelect('services.status', 'status')
       .leftJoinAndSelect('services.user', 'user')
+      .leftJoinAndSelect('services.extrasByServices', 'extrasByServices')
+      .leftJoinAndSelect('extrasByServices.extra', 'extra')
       .where('services.community_id = :communityId', { communityId });
 
     const services = await queryBuilder.getMany();
 
+    const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+
     const tableBody = [
-      ['Date', 'Schedule', 'Unit number', 'Unity size', 'Type', 'Status', 'Cleaner', 'Comment'].map(header => ({
+      ['Date', 'Schedule', 'Unit number', 'Unity size', 'Type', 'Type Price', 'Extras', 'Total', 'Cleaner'].map(header => ({
         text: header,
         fillColor: '#7b90be',
         color: '#ffffff'
@@ -558,17 +561,39 @@ export class ReportsService {
         const isLeasingCenter = service.unitNumber === 'Leasing center';
         const textColor = isLeasingCenter ? '#ff0000' : null;
         
+        const typePrice = Number(service.type?.price ?? 0);
+        const extrasTotal = service.extrasByServices?.reduce((acc, extraByService) => 
+          acc + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0;
+        const total = typePrice + extrasTotal;
+        
         return [
           { text: moment(service.date).format('MM/DD/YYYY'), color: textColor },
           { text: service.schedule ? moment(service.schedule, 'HH:mm:ss').format('hh:mm A') : 'N/A', color: textColor },
           { text: service.unitNumber ?? 'N/A', color: textColor },
           { text: service.unitySize ?? 'N/A', color: textColor },
           { text: service.type?.description ?? 'N/A', color: textColor },
-          { text: service.status?.statusName ?? 'N/A', color: textColor },
-          { text: service.user?.name ?? 'N/A', color: textColor },
-          { text: service.comment ?? 'N/A', color: textColor }
+          { text: formatCurrency(typePrice), color: textColor },
+          { text: formatCurrency(extrasTotal), color: textColor },
+          { text: formatCurrency(total), color: textColor },
+          { text: service.user?.name ?? 'N/A', color: textColor }
         ];
-      })
+      }),
+      ['', '', '', '', '', 
+        formatCurrency(services.reduce((acc, service) => acc + Number(service.type?.price ?? 0), 0)),
+        formatCurrency(services.reduce((acc, service) => 
+          acc + (service.extrasByServices?.reduce((sum, extraByService) => 
+            sum + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0), 0)),
+        formatCurrency(services.reduce((acc, service) => {
+          const typePrice = Number(service.type?.price ?? 0);
+          const extrasTotal = service.extrasByServices?.reduce((sum, extraByService) => 
+            sum + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0;
+          return acc + typePrice + extrasTotal;
+        }, 0)),
+        ''
+      ].map(cell => ({
+        text: cell,
+        fillColor: '#acb3c1'
+      }))
     ];
 
     const community = await this.communityRepository.findOne({ where: { id: communityId } });
@@ -603,7 +628,7 @@ export class ReportsService {
         {
           table: {
             headerRows: 1,
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: tableBody
           }
         }
