@@ -563,8 +563,8 @@ export class ReportsService {
           { text: service.schedule ? moment(service.schedule, 'HH:mm:ss').format('hh:mm A') : 'N/A', color: textColor },
           { text: service.unitNumber ?? 'N/A', color: textColor },
           { text: service.unitySize ?? 'N/A', color: textColor },
-          { text: service.type?.name ?? 'N/A', color: textColor },
-          { text: service.status?.name ?? 'N/A', color: textColor },
+          { text: service.type?.description ?? 'N/A', color: textColor },
+          { text: service.status?.statusName ?? 'N/A', color: textColor },
           { text: service.user?.name ?? 'N/A', color: textColor },
           { text: service.comment ?? 'N/A', color: textColor }
         ];
