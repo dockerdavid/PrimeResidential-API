@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
-import { In, Repository } from 'typeorm';
-import moment from 'moment';
+import { Repository, Not, IsNull, In } from 'typeorm';
+import * as moment from 'moment';
 
 import { ServicesByManagerDto } from './dto/services-by-manager.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -36,7 +35,7 @@ export class ServicesService {
     private readonly usersRepository: Repository<UsersEntity>,
     @InjectRepository(CommunitiesEntity)
     private readonly communitiesRepository: Repository<CommunitiesEntity>,
-    private readonly pushNotificationService: PushNotificationsService,
+    private readonly pushNotificationsService: PushNotificationsService,
   ) { }
 
   async searchByWord(searchDto: SearchDto, pageOptionsDto: PageOptionsDto): Promise<PageDto<ServicesEntity>> {
@@ -285,6 +284,7 @@ export class ServicesService {
     const service = this.servicesRepository.create(createServiceDtoCopy);
     await this.servicesRepository.save(service);
 
+    // Manejar extras
     let extras = [];
     if (Array.isArray(extraId) && extraId.length > 0) {
       extras = extraId.map(id =>
@@ -298,6 +298,28 @@ export class ServicesService {
       relations: ['community', 'status', 'type'],
     });
 
+    // Obtener el usuario que está creando el servicio
+    const creatingUser = await this.usersRepository.findOne({
+      where: { id: createServiceDto.userId }
+    });
+
+    // Obtener usuarios con token y teléfono
+    const usersWithToken = await this.usersRepository.find({
+      where: { token: Not(IsNull()) }
+    });
+
+    const usersWithPhone = await this.usersRepository.find({
+      where: { phoneNumber: Not(IsNull()) }
+    });
+
+    // Agregar el usuario creador a la lista si tiene teléfono
+    if (creatingUser?.phoneNumber) {
+      usersWithPhone.push(creatingUser);
+    }
+
+    console.log('Users with token:', usersWithToken);
+    console.log('Users with phone:', usersWithPhone);
+
     const notification = {
       body: `New service created for ${fullService.community?.communityName ?? 'Unknown Community'} on ${moment(fullService.date).format('DD/MM/YYYY')} in apartment number ${fullService.unitNumber}`,
       title: 'New Service Created',
@@ -307,9 +329,14 @@ export class ServicesService {
         serviceDate: service.date,
         serviceStatus: service.status,
       },
+      tokensNotification: {
+        tokens: usersWithToken.map(user => user.token),
+        users: usersWithPhone
+      }
     };
 
-    this.notifyInterestedParticipants(fullService, notification);
+    // Enviar notificaciones
+    await this.pushNotificationsService.sendNotification(notification);
 
     return {
       service: fullService,
@@ -475,7 +502,7 @@ export class ServicesService {
 
     const uniqueTokens = usersWithToken.map(u => u.token);
 
-    return this.pushNotificationService.sendNotification({
+    return this.pushNotificationsService.sendNotification({
       body: notification.body,
       title: notification.title,
       data: notification.data,
