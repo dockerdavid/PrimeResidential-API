@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not, IsNull, In } from 'typeorm';
-import * as moment from 'moment';
+import moment from 'moment';
 
 import { ServicesByManagerDto } from './dto/services-by-manager.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
