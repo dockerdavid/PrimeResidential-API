@@ -6,10 +6,11 @@ import { CostsEntity } from '../../entities/costs.entity';
 import { ExtrasByServiceEntity } from '../../entities/extras_by_service.entity';
 import { ServicesEntity } from '../../entities/services.entity';
 import { PrinterModule } from '../../printer/printer.module';
+import { CommunitiesEntity } from '../../entities/communities.entity';
 
 @Module({
   controllers: [ReportsController],
   providers: [ReportsService],
-  imports: [PrinterModule, TypeOrmModule.forFeature([CostsEntity, ServicesEntity, ExtrasByServiceEntity])],
+  imports: [PrinterModule, TypeOrmModule.forFeature([CostsEntity, ServicesEntity, ExtrasByServiceEntity, CommunitiesEntity])],
 })
 export class ReportsModule { }
