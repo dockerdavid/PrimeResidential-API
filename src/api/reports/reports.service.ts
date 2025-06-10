@@ -552,7 +552,7 @@ export class ReportsService {
     const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 
     const tableBody = [
-      ['Date', 'Schedule', 'Unit number', 'Unity size', 'Type', 'Type Price', 'Extras', 'Total', 'Cleaner'].map(header => ({
+      ['Date', 'Unit number', 'Type', 'Type Price', 'Extras', 'Total'].map(header => ({
         text: header,
         fillColor: '#7b90be',
         color: '#ffffff'
@@ -568,17 +568,14 @@ export class ReportsService {
         
         return [
           { text: moment(service.date).format('MM/DD/YYYY'), color: textColor },
-          { text: service.schedule ? moment(service.schedule, 'HH:mm:ss').format('hh:mm A') : 'N/A', color: textColor },
           { text: service.unitNumber ?? 'N/A', color: textColor },
-          { text: service.unitySize ?? 'N/A', color: textColor },
           { text: service.type?.description ?? 'N/A', color: textColor },
           { text: formatCurrency(typePrice), color: textColor },
           { text: formatCurrency(extrasTotal), color: textColor },
-          { text: formatCurrency(total), color: textColor },
-          { text: service.user?.name ?? 'N/A', color: textColor }
+          { text: formatCurrency(total), color: textColor }
         ];
       }),
-      ['', '', '', '', '', 
+      ['', '', '', 
         formatCurrency(services.reduce((acc, service) => acc + Number(service.type?.price ?? 0), 0)),
         formatCurrency(services.reduce((acc, service) => 
           acc + (service.extrasByServices?.reduce((sum, extraByService) => 
@@ -589,7 +586,6 @@ export class ReportsService {
             sum + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0;
           return acc + typePrice + extrasTotal;
         }, 0)),
-        ''
       ].map(cell => ({
         text: cell,
         fillColor: '#acb3c1'
@@ -628,7 +624,7 @@ export class ReportsService {
         {
           table: {
             headerRows: 1,
-            widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*'],
+            widths: ['*', '*', '*', '*', '*', '*'],
             body: tableBody
           }
         }
