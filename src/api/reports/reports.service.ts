@@ -288,7 +288,7 @@ export class ReportsService {
         {
           table: {
             headerRows: 1,
-            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['10%', '10%', '10%', '10%', '15%', '12%', '12%', '12%', '9%'],
             body: tableBody
           }
         },
