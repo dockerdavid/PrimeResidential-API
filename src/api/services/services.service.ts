@@ -274,6 +274,7 @@ export class ServicesService {
 
   async create(createServiceDto: CreateServiceDto) {
     const { extraId, ...createServiceDtoCopy } = createServiceDto;
+    console.log(createServiceDtoCopy);
 
     const service = this.servicesRepository.create(createServiceDtoCopy);
     await this.servicesRepository.save(service);
