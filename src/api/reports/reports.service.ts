@@ -147,9 +147,41 @@ export class ReportsService {
     const totalExtrasCommission = servicesDashboard.reduce((acc, service) =>
       acc + (service.extrasByServices?.reduce((sum, extraByService) => sum + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0), 0);
     const totalCleanerSum = servicesDashboard.reduce((acc, service) => acc + (service.totalCleaner ?? 0), 0);
-    const totalHugoSum = servicesDashboard.reduce((acc, service) => acc + ((service.total ?? 0) * this.hugoComission), 0);
-    const totalFelixSum = servicesDashboard.reduce((acc, service) => acc + ((service.total ?? 0) * this.felixComission), 0);
-    const totalFelixSonSum = servicesDashboard.reduce((acc, service) => acc + ((service.total ?? 0) * this.felixSonComission), 0);
+
+    // ---------- Sección de la tabla de Costos ----------
+    const costs = [];
+
+    const costsVariables = await this.costsRepository.find({
+      where: {
+        date: Between(startOfWeek, endOfWeek),
+      },
+    });
+
+    const extraCosts = [
+      { date: today.format('MM/DD/YYYY'), description: 'GoDaddy (email QPS)', amount: 2.5 },
+      { date: today.format('MM/DD/YYYY'), description: 'Savings Navidad', amount: 75 },
+      { date: today.format('MM/DD/YYYY'), description: 'Kemper (Insurance)', amount: 105.75 },
+      { date: today.format('MM/DD/YYYY'), description: 'Next Insurance G/L', amount: 20 },
+    ];
+
+    costs.push(
+      ...extraCosts.map(cost => ({
+        date: moment(cost.date).format('YYYY-MM-DD'),
+        description: cost.description,
+        amount: cost.amount,
+      })),
+      ...costsVariables,
+    );
+
+    const totalCosts = costs.reduce((sum, cost) => sum + Number(cost.amount), 0);
+    
+    // Cálculo correcto del beneficio neto
+    const netProfit = (totalServicePrice + totalExtrasPrice - totalCleanerSum - totalCosts);
+    
+    // Aplicar porcentajes de comisión al beneficio neto
+    const totalHugoSum = netProfit * this.hugoComission;
+    const totalFelixSum = netProfit * this.felixComission;
+    const totalFelixSonSum = netProfit * this.felixSonComission;
 
     const tableBody = [
       ['Date', 'Community', 'Unit number', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Cleaner'].map(header => ({
@@ -186,34 +218,6 @@ export class ReportsService {
       }))
     ];
 
-    // ---------- Sección de la tabla de Costos ----------
-    const costs = [];
-
-    const costsVariables = await this.costsRepository.find({
-      where: {
-        date: Between(startOfWeek, endOfWeek),
-      },
-    });
-
-    const extraCosts = [
-      { date: today.format('MM/DD/YYYY'), description: 'GoDaddy (email QPS)', amount: 2.5 },
-      { date: today.format('MM/DD/YYYY'), description: 'Savings Navidad', amount: 75 },
-      { date: today.format('MM/DD/YYYY'), description: 'Kemper (Insurance)', amount: 105.75 },
-      { date: today.format('MM/DD/YYYY'), description: 'Next Insurance G/L', amount: 20 },
-    ];
-
-    costs.push(
-      ...extraCosts.map(cost => ({
-        date: moment(cost.date).format('YYYY-MM-DD'),
-        description: cost.description,
-        amount: cost.amount,
-      })),
-      ...costsVariables,
-    );
-
-    const totalCosts = costs.reduce((sum, cost) => sum + Number(cost.amount), 0);
-    const costPerShareholder = totalCosts / 3; // 33% para cada accionista
-
     // Nueva tabla de comisiones con costos
     const comisionesTableBody = [
       ['Accionista', 'Porcentaje', 'Ganancia Bruta', 'Costos (33%)', 'Ganancia Neta'],
@@ -221,22 +225,22 @@ export class ReportsService {
         'Hugo',
         '20%',
         formatCurrency(totalHugoSum),
-        formatCurrency(costPerShareholder),
-        formatCurrency(totalHugoSum - costPerShareholder)
+        formatCurrency(totalCosts * 0.33),
+        formatCurrency(totalHugoSum - (totalCosts * 0.33))
       ],
       [
         'Felix',
         '60%',
         formatCurrency(totalFelixSum),
-        formatCurrency(costPerShareholder),
-        formatCurrency(totalFelixSum - costPerShareholder)
+        formatCurrency(totalCosts * 0.33),
+        formatCurrency(totalFelixSum - (totalCosts * 0.33))
       ],
       [
         'Felix hijo',
         '20%',
         formatCurrency(totalFelixSonSum),
-        formatCurrency(costPerShareholder),
-        formatCurrency(totalFelixSonSum - costPerShareholder)
+        formatCurrency(totalCosts * 0.33),
+        formatCurrency(totalFelixSonSum - (totalCosts * 0.33))
       ],
       [
         'Total',
