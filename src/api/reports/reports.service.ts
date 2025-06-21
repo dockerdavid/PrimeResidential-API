@@ -200,7 +200,7 @@ export class ReportsService {
 
     // Generar tabla agrupada por comunidad
     const tableBody = [
-      ['Date', 'Community', 'Unit number', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Cleaner'].map(header => ({
+      ['Date', 'Community', 'Unit number', 'Type', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Cleaner'].map(header => ({
         text: header,
         fillColor: '#7b90be',
         color: '#ffffff'
@@ -219,6 +219,7 @@ export class ReportsService {
         { text: '', fillColor: '#e6e6e6', color: '#000000' },
         { text: '', fillColor: '#e6e6e6', color: '#000000' },
         { text: '', fillColor: '#e6e6e6', color: '#000000' },
+        { text: '', fillColor: '#e6e6e6', color: '#000000' },
         { text: '', fillColor: '#e6e6e6', color: '#000000' }
       ]);
 
@@ -228,10 +229,16 @@ export class ReportsService {
         const isLeasingCenter = service.unitNumber?.toLowerCase() === 'leasing center';
         const textColor = isLeasingCenter ? '#ff0000' : null;
         
+        // Create type display string with description and cleaning type
+        const typeDisplay = service.type 
+          ? `${service.type.description} (${service.type.cleaningType})`
+          : 'N/A';
+        
         tableBody.push([
           { text: moment(service.date).format('MM/DD/YYYY'), color: textColor, fillColor: null },
           { text: service.community?.communityName ?? 'N/A', color: textColor, fillColor: null },
           { text: service.unitNumber ?? 'N/A', color: textColor, fillColor: null },
+          { text: typeDisplay, color: textColor, fillColor: null },
           { text: formatCurrency(Number(service.type?.price ?? 0)), color: textColor, fillColor: null },
           { text: formatCurrency(Number(service.type?.commission ?? 0)), color: textColor, fillColor: null },
           { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0), color: textColor, fillColor: null },
@@ -247,6 +254,7 @@ export class ReportsService {
       { text: '', fillColor: '#acb3c1', color: null },
       { text: '', fillColor: '#acb3c1', color: null },
       { text: 'Total', fillColor: '#acb3c1', color: null },
+      { text: '', fillColor: '#acb3c1', color: null },
       { text: formatCurrency(totalServicePrice), fillColor: '#acb3c1', color: null },
       { text: formatCurrency(totalServiceCommission), fillColor: '#acb3c1', color: null },
       { text: formatCurrency(totalExtrasPrice), fillColor: '#acb3c1', color: null },
@@ -321,7 +329,7 @@ export class ReportsService {
         {
           table: {
             headerRows: 1,
-            widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*'],
+            widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
             body: tableBody
           }
         },
