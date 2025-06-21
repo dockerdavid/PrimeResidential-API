@@ -231,7 +231,7 @@ export class ReportsService {
         
         // Create type display string with description and cleaning type
         const typeDisplay = service.type 
-          ? `${service.type.description} (${service.type.cleaningType})`
+          ? `${service.type.cleaningType} (${service.type.description})`
           : 'N/A';
         
         tableBody.push([
