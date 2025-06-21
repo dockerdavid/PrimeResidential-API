@@ -114,6 +114,21 @@ export class ReportsService {
 
     const services = await queryBuilder.getMany();
 
+    // Agrupar servicios por comunidad
+    const servicesByCommunity = new Map<string, ServicesEntity[]>();
+    services.forEach(service => {
+      const communityName = service.community?.communityName || "Sin Comunidad";
+      if (!servicesByCommunity.has(communityName)) {
+        servicesByCommunity.set(communityName, []);
+      }
+      servicesByCommunity.get(communityName).push(service);
+    });
+
+    // Ordenar servicios por fecha descendente dentro de cada comunidad
+    servicesByCommunity.forEach((communityServices, communityName) => {
+      communityServices.sort((a, b) => moment(b.date).valueOf() - moment(a.date).valueOf());
+    });
+
     const servicesDashboard = services.map(service => {
       const totalExtrasByService = service.extrasByServices?.reduce((acc, extraByService) => {
         const commission = extraByService?.extra?.commission ?? 0;
@@ -183,40 +198,62 @@ export class ReportsService {
     const totalFelixSum = netProfit * this.felixComission;
     const totalFelixSonSum = netProfit * this.felixSonComission;
 
+    // Generar tabla agrupada por comunidad
     const tableBody = [
       ['Date', 'Community', 'Unit number', 'Service Price', 'Service comission', 'Extras price', 'Extras comission', 'Total cleaner', 'Cleaner'].map(header => ({
         text: header,
         fillColor: '#7b90be',
         color: '#ffffff'
-      })),
-      ...servicesDashboard.map(service => {
+      }))
+    ];
+
+    // Agregar servicios agrupados por comunidad
+    servicesByCommunity.forEach((communityServices, communityName) => {
+      // Agregar header de comunidad
+      tableBody.push([
+        { text: communityName, fillColor: '#e6e6e6', color: '#000000' },
+        { text: '', fillColor: '#e6e6e6', color: '#000000' },
+        { text: '', fillColor: '#e6e6e6', color: '#000000' },
+        { text: '', fillColor: '#e6e6e6', color: '#000000' },
+        { text: '', fillColor: '#e6e6e6', color: '#000000' },
+        { text: '', fillColor: '#e6e6e6', color: '#000000' },
+        { text: '', fillColor: '#e6e6e6', color: '#000000' },
+        { text: '', fillColor: '#e6e6e6', color: '#000000' },
+        { text: '', fillColor: '#e6e6e6', color: '#000000' }
+      ]);
+
+      // Agregar servicios de esta comunidad
+      communityServices.forEach(service => {
+        const serviceDashboard = servicesDashboard.find(s => s.id === service.id);
         const isLeasingCenter = service.unitNumber?.toLowerCase() === 'leasing center';
         const textColor = isLeasingCenter ? '#ff0000' : null;
         
-        return [
-          { text: moment(service.date).format('MM/DD/YYYY'), color: textColor },
-          { text: service.community?.communityName ?? 'N/A', color: textColor },
-          { text: service.unitNumber ?? 'N/A', color: textColor },
-          { text: formatCurrency(Number(service.type?.price ?? 0)), color: textColor },
-          { text: formatCurrency(Number(service.type?.commission ?? 0)), color: textColor },
-          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0), color: textColor },
-          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0), color: textColor },
-          { text: formatCurrency(Number(service.totalCleaner ?? 0)), color: textColor },
-          { text: service.user?.name ?? 'N/A', color: textColor }
-        ];
-      }),
-      ['', '', 'Total',
-        formatCurrency(totalServicePrice),
-        formatCurrency(totalServiceCommission),
-        formatCurrency(totalExtrasPrice),
-        formatCurrency(totalExtrasCommission),
-        formatCurrency(totalCleanerSum),
-        ''
-      ].map(cell => ({
-        text: cell,
-        fillColor: '#acb3c1'
-      }))
-    ];
+        tableBody.push([
+          { text: moment(service.date).format('MM/DD/YYYY'), color: textColor, fillColor: null },
+          { text: service.community?.communityName ?? 'N/A', color: textColor, fillColor: null },
+          { text: service.unitNumber ?? 'N/A', color: textColor, fillColor: null },
+          { text: formatCurrency(Number(service.type?.price ?? 0)), color: textColor, fillColor: null },
+          { text: formatCurrency(Number(service.type?.commission ?? 0)), color: textColor, fillColor: null },
+          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0), color: textColor, fillColor: null },
+          { text: formatCurrency(service.extrasByServices?.reduce((acc, extraByService) => acc + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0), color: textColor, fillColor: null },
+          { text: formatCurrency(Number(serviceDashboard?.totalCleaner ?? 0)), color: textColor, fillColor: null },
+          { text: service.user?.name ?? 'N/A', color: textColor, fillColor: null }
+        ]);
+      });
+    });
+
+    // Agregar fila de totales
+    tableBody.push([
+      { text: '', fillColor: '#acb3c1', color: null },
+      { text: '', fillColor: '#acb3c1', color: null },
+      { text: 'Total', fillColor: '#acb3c1', color: null },
+      { text: formatCurrency(totalServicePrice), fillColor: '#acb3c1', color: null },
+      { text: formatCurrency(totalServiceCommission), fillColor: '#acb3c1', color: null },
+      { text: formatCurrency(totalExtrasPrice), fillColor: '#acb3c1', color: null },
+      { text: formatCurrency(totalExtrasCommission), fillColor: '#acb3c1', color: null },
+      { text: formatCurrency(totalCleanerSum), fillColor: '#acb3c1', color: null },
+      { text: '', fillColor: '#acb3c1', color: null }
+    ]);
 
     // Nueva tabla de comisiones con costos
     const comisionesTableBody = [
