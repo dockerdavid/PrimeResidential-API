@@ -68,7 +68,7 @@ const customTableLayouts: Record<string, CustomTableLayout> = {
             
             // Obtener el contenido de la celda de Unit number (columna 2)
             const row = node.table.body[rowIndex];
-            if (row && Array.isArray(row) && row[2] === 'Leasing center') {
+            if (row && Array.isArray(row) && String(row[2]).toLowerCase() === 'leasing center') {
                 return '#ff0000';
             }
             
@@ -190,7 +190,7 @@ export class ReportsService {
         color: '#ffffff'
       })),
       ...servicesDashboard.map(service => {
-        const isLeasingCenter = service.unitNumber === 'Leasing center';
+        const isLeasingCenter = service.unitNumber?.toLowerCase() === 'leasing center';
         const textColor = isLeasingCenter ? '#ff0000' : null;
         
         return [
@@ -220,34 +220,26 @@ export class ReportsService {
 
     // Nueva tabla de comisiones con costos
     const comisionesTableBody = [
-      ['Accionista', 'Porcentaje', 'Ganancia Bruta', 'Costos (33%)', 'Ganancia Neta'],
+      ['Accionista', 'Porcentaje', 'Ganancia Neta'],
       [
         'Hugo',
         '20%',
-        formatCurrency(totalHugoSum),
-        formatCurrency(totalCosts * 0.33),
-        formatCurrency(totalHugoSum - (totalCosts * 0.33))
+        formatCurrency(totalHugoSum)
       ],
       [
         'Felix',
         '60%',
-        formatCurrency(totalFelixSum),
-        formatCurrency(totalCosts * 0.33),
-        formatCurrency(totalFelixSum - (totalCosts * 0.33))
+        formatCurrency(totalFelixSum)
       ],
       [
         'Felix hijo',
         '20%',
-        formatCurrency(totalFelixSonSum),
-        formatCurrency(totalCosts * 0.33),
-        formatCurrency(totalFelixSonSum - (totalCosts * 0.33))
+        formatCurrency(totalFelixSonSum)
       ],
       [
         'Total',
         '100%',
-        formatCurrency(totalHugoSum + totalFelixSum + totalFelixSonSum),
-        formatCurrency(totalCosts),
-        formatCurrency((totalHugoSum + totalFelixSum + totalFelixSonSum) - totalCosts)
+        formatCurrency(totalHugoSum + totalFelixSum + totalFelixSonSum)
       ]
     ];
 
@@ -305,7 +297,7 @@ export class ReportsService {
           layout: 'customLayout01',
           table: {
             headerRows: 1,
-            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['*', 'auto', 'auto'],
             body: comisionesTableBody
           }
         },
@@ -562,7 +554,7 @@ export class ReportsService {
         color: '#ffffff'
       })),
       ...services.map(service => {
-        const isLeasingCenter = service.unitNumber === 'Leasing center';
+        const isLeasingCenter = service.unitNumber?.toLowerCase() === 'leasing center';
         const textColor = isLeasingCenter ? '#ff0000' : null;
         
         const typePrice = Number(service.type?.price ?? 0);
