@@ -146,7 +146,7 @@ export class ReportsService {
       acc + (service.extrasByServices?.reduce((sum, extraByService) => sum + Number(extraByService?.extra?.itemPrice ?? 0), 0) ?? 0), 0);
     const totalExtrasCommission = servicesDashboard.reduce((acc, service) =>
       acc + (service.extrasByServices?.reduce((sum, extraByService) => sum + Number(extraByService?.extra?.commission ?? 0), 0) ?? 0), 0);
-    const totalCleanerSum = servicesDashboard.reduce((acc, service) => acc + (service.totalCleaner ?? 0), 0);
+    const totalCleanerSum = totalServiceCommission + totalExtrasCommission;
 
     // ---------- Sección de la tabla de Costos ----------
     const costs = [];
