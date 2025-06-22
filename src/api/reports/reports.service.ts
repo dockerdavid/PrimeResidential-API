@@ -81,9 +81,7 @@ const customTableLayouts: Record<string, CustomTableLayout> = {
 @Injectable()
 export class ReportsService {
 
-  private readonly hugoComission = 0.2;
-  private readonly felixComission = 0.6;
-  private readonly felixSonComission = 0.2;
+  private readonly jesusVargasComission = 1.0;
 
   constructor(
     private readonly printerService: PrinterService,
@@ -194,9 +192,7 @@ export class ReportsService {
     const netProfit = (totalServicePrice + totalExtrasPrice - totalCleanerSum - totalCosts);
     
     // Aplicar porcentajes de comisión al beneficio neto
-    const totalHugoSum = netProfit * this.hugoComission;
-    const totalFelixSum = netProfit * this.felixComission;
-    const totalFelixSonSum = netProfit * this.felixSonComission;
+    const totalJesusVargasSum = netProfit * this.jesusVargasComission;
 
     // Generar tabla agrupada por comunidad
     const tableBody = [
@@ -267,24 +263,14 @@ export class ReportsService {
     const comisionesTableBody = [
       ['Accionista', 'Porcentaje', 'Ganancia Neta'],
       [
-        'Hugo',
-        '20%',
-        formatCurrency(totalHugoSum)
-      ],
-      [
-        'Felix',
-        '60%',
-        formatCurrency(totalFelixSum)
-      ],
-      [
-        'Felix hijo',
-        '20%',
-        formatCurrency(totalFelixSonSum)
+        'Jesus Vargas',
+        '100%',
+        formatCurrency(totalJesusVargasSum)
       ],
       [
         'Total',
         '100%',
-        formatCurrency(totalHugoSum + totalFelixSum + totalFelixSonSum)
+        formatCurrency(totalJesusVargasSum)
       ]
     ];
 
