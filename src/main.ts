@@ -13,7 +13,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const config = new DocumentBuilder()
-    .setTitle('Services QPS API')
+    .setTitle('Prime Residential Services API')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
