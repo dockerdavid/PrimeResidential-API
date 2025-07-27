@@ -263,7 +263,7 @@ export class ReportsService {
     const comisionesTableBody = [
       ['Accionista', 'Porcentaje', 'Ganancia Neta'],
       [
-        'Jesus Vargas',
+        'Jesus Vegas',
         '100%',
         formatCurrency(totalJesusVargasSum)
       ],
